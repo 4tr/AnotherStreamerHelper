@@ -1,0 +1,8 @@
+Experimental code with module loading. Initially needed for viewing comments on online streams (e.g., YouTube or Twitch) and supporting streamers.
+
+The startup script creates a venv and loads it.
+
+At this stage, there are a lot of bugs, but dependencies should load automatically at startup.
+To check the chat, you need to specify the channel in the file /models/twitchChatreader.py.
+
+
