@@ -173,16 +173,23 @@ def get_list_functions_module(mod):
     
 
 def get_hooks_module(name,mod):
+    
+    ##!!! TODO хуки чтобы не досыпало  наследуемые  типа __module__ __dict__ __weakref__ __doc__
+
+    if getattr(mod, "hook", None) == None:
+        #print("нет хуков для добавления")
+        return
     try: 
         tmp = mod.hook.__dict__.items()
     except Exception as e:
         print(f"[{name}] Ошибка загрузки хуков: {e}")  
         return
-    list = {}
+    #list = {}
     for k,v in tmp:
-        if inspect.isfunction(v):            
+        if inspect.isfunction(v): 
+                     
             app_data.add_hook(name_hook= k, hookfunc=v , modulename=  name)
-            list[k]=v
+            #list[k]=v
     
         
 

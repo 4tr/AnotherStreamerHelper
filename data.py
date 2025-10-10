@@ -15,6 +15,7 @@ class AppData:
         self.hooks = {}
     
     def add_hook(self, name_hook, hookfunc , modulename):
+        #print("[",modulename,"] добавление хука ", name_hook)
         try:
             tmp = type(self.hooks[name_hook])
         except KeyError:

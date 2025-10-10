@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "Twitch chat reader",
     "description": "Получает коменты с чатика на твиче",
     "type": "chat",
-    "autorun":True,
+    "autorun":False,
     "thread":True    
 }
 
@@ -25,7 +25,7 @@ def run():
     #nickname = 'YourTwitchLogin'
     nickname = f"justinfan67420"  # Анонимный ник для чтения
     #token = 'oauth:xxxxxxxxxxxxxxxxxxxxxx'  # получить на twitchapps.com/tmi
-    token = 'SCHMOOPIIE'  # получить на twitchapps.com/tmi
+    token = 'SCHMOOPIIE'  
     
     
 
