@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+	<div id="com">	                              
+    	</div>      	
+       <script>
+            let last = -1
+            function co(d){
+	     let div = document.createElement('div');
+			    div.innerHTML =`			    	
+			    	<div id="nn_${d.nn}">
+			    		<img src="${d.a}" width="50" height="50"/> ${d.name}:${d.msg}
+			    	</div>
+			    	`;			    
+		            return div.firstElementChild;
+            }
+            
+            
+            function add(d){
+            //console.log("------------------");
+            //console.log(d);
+            //document.getElementById('com').innerHTML = co(d) + document.getElementById('com').innerHTML;
+            	var pE = document.getElementById('com');
+		var FC = pE.firstChild;
+		var nE = co(d);
+		pE.insertBefore(nE, FC);
+            }
+	    function get() {
+		fetch('http://127.0.0.1:5000/get?last=' + last)
+		    .then(response => response.json())
+		    .then(data => {
+		        data.forEach((item) => {
+			  add(item);
+			  last = item.nn;
+			});
+		        //console.log(data);
+		        
+		    })
+		    .catch(error => {
+		        console.error('Ошибка:', error);
+		    });
+	    }
+	    get();
+	    setInterval(get, 3000);
+	</script>
+</body>
+</html>
+

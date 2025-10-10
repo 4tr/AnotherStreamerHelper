@@ -3,7 +3,7 @@ __plugin__ = {
     "name": "flask web server",
     "description": "веб сервер flask",
     "type": "web" ,
-    "autorun":False, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
+    "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # переносит модуль в список загружаемых в первую очередь
     "thread": True   # нужно для модулей которые имеют собственные бесконечные циклы дабы не фризить работу кода
 }
@@ -29,6 +29,20 @@ app = Flask(__name__, template_folder=template_dir + "/templates" , static_folde
 @app.route("/", methods=["GET", "POST","HEAD"])
 def index():
     return render_template("index.html")
+
+@app.route("/comments", methods=["GET", "POST"])
+def comments():    
+    return render_template("com.html")
+
+@app.route("/get")
+def get():    
+    last = int(request.args.get("last", ""))
+    tmp=[]
+    for v in app_data.com:
+        if v["nn"] > last:
+            tmp.append(v)
+    return jsonify(tmp)
+
         
 # запускается после помещения модуль в список загруженных модулей (приложения) 
 def run():

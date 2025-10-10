@@ -2,14 +2,14 @@ __plugin__ = {
     "name": "Twitch chat reader",
     "description": "Получает коменты с чатика на твиче",
     "type": "chat",
-    "autorun":False,
+    "autorun":True,
     "thread":True    
 }
 
 #import websockets
 import socket
 
-channel = 'mankej_'  # канал указывать без '#'
+channel = 'vexviscera'  # канал указывать без '#'
 
 import ssl
 from data import app_data
@@ -59,17 +59,47 @@ def run():
 
                        
                         #print(parts)
-                        #print(mail)   
+                        primer = {
+                            '@badge-info': '', 
+                            'badges': '', 
+                            'color': '', 
+                            'display-name': 'ChannelCanalDuke', 
+                            'emotes': '', 
+                            'first-msg': '0', 
+                            'flags': '', 
+                            'id': '9296a811-f4cd-4ea9-ab2a-3843263318d1', 
+                            'mod': '0', 
+                            'returning-chatter': '0', 
+                            'room-id': '105458682', 
+                            'subscriber': '0', 
+                            'tmi-sent-ts': '1760093268055', 
+                            'turbo': '0', 
+                            'user-id': '1351814626', 
+                            'user-type': ''} 
+                        
+                        parts["name"]=parts["display-name"]
+                        del parts["display-name"]
+                        parts["id"]=parts["user-id"]
+                        del parts["user-id"]
+                        parts["pl"] = "tw"
+                        parts["t"] = parts["tmi-sent-ts"]
+                        del parts["tmi-sent-ts"]
+                        parts["a"] = ""
+                        
+                        print(mail)   
                         
                         test = text[1].split("\n")
                         if len(test) > 1 :
                             text[1]=test[0]
-                            ho("translate",text) 
-                            print("\033[0;31m[Twitch]\033[0;39m \033[0;35m",parts["display-name"],"\033[0;39m:", text[1])
+                            #ho("translate",text) 
+                            print("\033[0;31m[Twitch]\033[0;39m \033[0;35m",parts["name"],"\033[0;39m:", text[1])
                             
                         else:
-                            ho("translate",text)                             
-                            print("[Twitch] \033[0;35m",parts["display-name"],"\033[0;39m:", text[1])
+                            #ho("translate",text)                             
+                            print("[Twitch] \033[0;35m",parts["name"],"\033[0;39m:", text[1])
+                        parts["msg"] = text[1]    
+                        app_data.add_com(parts)
+                        #print(app_data.com)    
                         #app_data.modules["AI_translate"]["module"].aitr.translate(text[1])
                         
                         #print(app_data.hook(hook_name="translate

@@ -78,8 +78,8 @@ def require(package, pip_name=None):
         return importlib.import_module(package)
 
 # пример
-requests = require("requests")
-flask = require("flask")
+#requests = require("requests")
+#flask = require("flask")
 
 
 
@@ -101,7 +101,7 @@ def list_modules(path=app_data.module_dir):
 
 # эта хреновина по сути УЖЕ грузит модуль и при ошибках пытается доустановить зависимости
 def lmd(module_name, package=app_data.module_dir,last_err = ""):
-    print(f"[{module_name}] запуск модуля")
+    print(f"[{module_name}] импорт модуля")
     try:
         return {"ok":True,"e":"","mod":importlib.import_module(f"{package}.{module_name}")}
     except ModuleNotFoundError as e:                
@@ -249,11 +249,23 @@ def load_all_modules(path=app_data.module_dir):
         if r["ok"] == True:
             loader(r["mod"],name,False)        
 
+    runWebWindow = False
     #запуск функций модулей
-    for name in valid_first:
-        runner(name)     
+    for name in valid_first:        
+        if name == "web_client": #костыль!!!
+            runWebWindow = True
+        else:    
+            runner(name)     
     for name in valid_other:
-        runner(name)        
+        if name == "web_client": #костыль!!!
+            runWebWindow = True
+        else:    
+            runner(name)     
+    
+    #костыль!!!
+    if runWebWindow :
+        runner("web_client")
+    
     
 
 

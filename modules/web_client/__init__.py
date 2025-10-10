@@ -3,7 +3,7 @@ __plugin__ = {
     "name": "web client ",
     "description": "веб сервер flask",
     "type": "web" ,
-    "autorun":False, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
+    "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # переносит модуль в список загружаемых в первую очередь
     "thread": False   # нужно для модулей которые имеют собственные бесконечные циклы дабы не фризить работу кода
 }
@@ -39,12 +39,12 @@ def web_wind(url = "",win_name = ""):
 # запускается после помещения модуль в список загруженных модулей (приложения) 
 def run():   
      
-    os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--proxy-server=socks5://localhost:8888"
+    #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--proxy-server=socks5://localhost:8888"
     windows_app = QApplication(sys.argv)        
-    cm = web_wind("http://"+IP+":"+str(PORT)+"/","test")            
+    cm = web_wind("http://"+IP+":"+str(PORT)+"/comments","Коментарии")            
     print("["+__name__.split(".")[-1]+"] OK")  
-    windows_app.exec_()                  
-    #sys.exit(windows_app.exec_())
+    #windows_app.exec_()                  
+    sys.exit(windows_app.exec_())
      
        
 

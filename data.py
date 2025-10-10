@@ -2,8 +2,12 @@ import threading
 import os
 os.environ['HF_HOME'] = os.getcwd() + "/cache/huggingface"
 
+
+
+
 class AppData:
     def __init__(self):
+        self.com = [] # помойка комментариев
         self.stop = False
         self._lock = threading.Lock()  # блокируем доступ для потокобезопасности
         self.value = 0
@@ -13,6 +17,30 @@ class AppData:
         self.modules = {}
         self.threads = {}
         self.hooks = {}
+        # шаблоны для чата для консоли и нейронки
+        self.com_Prep = {
+            "Console" :{"name": "Console", "id": "Console", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/console.png", "msg" : ""},
+            "AI" : {"name": "AI", "id": "AI", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/AI.png", "msg" : ""},
+            "Bot" : {"name": "Bot", "id": "Bot", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/Bot.png", "msg" : ""}
+        }
+        # список элементов в сообщении чата
+        self.com_keys = ["name", "id", "pl", "t", "a","msg"]
+    
+    def add_com(self,msg, uid = None):
+        
+        if uid == None:        
+            params = msg.copy()
+        else:
+            if (uid != "AI") and (uid != "Bot") and (uid != "Console"):
+                return
+            params = comPrep[uid].copy()
+            params['msg']=str(msg[msg])
+        
+        params["nn"]=len(self.com)           
+        
+        # чекнуть пользователя *** 
+                
+        self.com.append(params)    
     
     def add_hook(self, name_hook, hookfunc , modulename):
         #print("[",modulename,"] добавление хука ", name_hook)
