@@ -61,6 +61,9 @@ def inspect_module(path):
 
 
 def install(package):
+    #stupid fix я не понимаю какого фига но так у меня работает
+    if package == "PyQt5.QtWebEngineWidgets":
+        package = "PyQtWebEngine"
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 def uninstall(package):
     subprocess.check_call([sys.executable, "-m", "pip", "uninstall", package])
@@ -191,7 +194,16 @@ def get_hooks_module(name,mod):
             app_data.add_hook(name_hook= k, hookfunc=v , modulename=  name)
             #list[k]=v
     
-        
+def runner(name):
+        print("\033[42m \033[0;39m запуск:<", name , "> \033[0;39m ")        
+        mod = app_data.modules[name]["module"]
+        info = app_data.modules[name]["info"]        
+        if info['thread'] == True:
+            app_data.add_threads(mod.run,name)
+        else:    
+            mod.run()
+    
+
 
 def loader(mod,name,first_load = True): 
     vm = validate_module(mod)
@@ -201,11 +213,7 @@ def loader(mod,name,first_load = True):
             return         
         app_data.add_mod({"name": name, "module": mod, "info": info})
         get_hooks_module(name,mod)
-        print("\033[42m \033[0;39m успешно загружен:<", name , "> \033[1;97m", info["name"], "\033[0;39m ")
-        if info['thread'] == True:
-            app_data.add_threads(mod.run,name)
-        else:    
-            mod.run()
+        print("\033[42m \033[0;39m успешно загружен:<", name , "> \033[1;97m", info["name"], "\033[0;39m ")        
     else:
         print(vm["e"])  
 # попытка проанализоровать модуль до того как он загрузится
@@ -241,7 +249,12 @@ def load_all_modules(path=app_data.module_dir):
         if r["ok"] == True:
             loader(r["mod"],name,False)        
 
-
+    #запуск функций модулей
+    for name in valid_first:
+        runner(name)     
+    for name in valid_other:
+        runner(name)        
+    
 
 
 
