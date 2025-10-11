@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "AI Translator",
     "description": "nllb-200 переводчик",
     "type": "text_modificator" ,
-    "thread" : False, # этому модулю вроде не нужно работать самостоятельно
+    "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
     "first_load": True,
     "autorun": False
 }

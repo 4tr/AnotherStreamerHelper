@@ -3,17 +3,52 @@ __plugin__ = {
     "description": "Получает коменты с чатика на твиче",
     "type": "chat",
     "autorun":True,
-    "thread":True    
+    "run_mode": 1 #0 - standart,  1 - thread, 2 - multiprocessing      
 }
+
 
 #import websockets
 import socket
 
-channel = 'vexviscera'  # канал указывать без '#'
-
+channel = 'arti9m'  # канал указывать без '#'
+nickname = f"justinfan67420"  # Анонимный ник для чтения
+token = 'SCHMOOPIIE'  
+ 
 import ssl
 from data import app_data
 ho = app_data.hook
+
+def get_global_emotes(client_id, token):
+    url = "https://api.twitch.tv/helix/chat/emotes/global"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Client-Id": client_id
+    }
+    resp = requests.get(url, headers=headers)
+    data = resp.json()
+    # `data["data"]` — список эмодзи, каждый c полями id, name, images
+    return data["data"]
+def parse_emotes_tag(emotes_tag, message_text):
+    """
+    emotes_tag: строка как "25:0-4,1902:6-10"
+    message_text: полный текст сообщения
+    Возвращает список кортежей (emote_id, start_idx, end_idx, emote_text)
+    """
+    result = []
+    if not emotes_tag:
+        return result
+    for part in emotes_tag.split('/'):  # иногда несколько наборов через '/'
+        for pair in part.split(','):
+            if not pair:
+                continue
+            emote_id, ranges = pair.split(':')
+            for rang in ranges.split(','):
+                start, end = rang.split('-')
+                start = int(start)
+                end = int(end)
+                emote_text = message_text[start:end+1]
+                result.append((emote_id, start, end, emote_text))
+    return result
 
 def run():
    # listen(add_message=app_data.add_message, channel_name="malic_vr")
@@ -23,9 +58,9 @@ def run():
     server = 'irc.chat.twitch.tv'
     port = 6667
     #nickname = 'YourTwitchLogin'
-    nickname = f"justinfan67420"  # Анонимный ник для чтения
+   
     #token = 'oauth:xxxxxxxxxxxxxxxxxxxxxx'  # получить на twitchapps.com/tmi
-    token = 'SCHMOOPIIE'  
+    
     
     
 
@@ -59,23 +94,28 @@ def run():
 
                        
                         #print(parts)
-                        primer = {
-                            '@badge-info': '', 
-                            'badges': '', 
-                            'color': '', 
-                            'display-name': 'ChannelCanalDuke', 
-                            'emotes': '', 
-                            'first-msg': '0', 
-                            'flags': '', 
-                            'id': '9296a811-f4cd-4ea9-ab2a-3843263318d1', 
-                            'mod': '0', 
-                            'returning-chatter': '0', 
-                            'room-id': '105458682', 
-                            'subscriber': '0', 
-                            'tmi-sent-ts': '1760093268055', 
-                            'turbo': '0', 
-                            'user-id': '1351814626', 
-                            'user-type': ''} 
+                        primer2 = {
+                                '@badge-info': '', 
+                                'badges': '', 
+                                'client-nonce': '583425313e4e2cbb94209a1e29d58d77', 
+                                'color': '#0000FF', 
+                                'emote-only': '1', 
+                                'emotes': '133468:0-11', 
+                                'first-msg': '0', 
+                                'flags': '', 
+                                'id': '518271413', 
+                                'mod': '0', 
+                                'returning-chatter': '0', 
+                                'room-id': '53558942', 
+                                'subscriber': '0', 
+                                'turbo': '0', 
+                                'user-type': '', 
+                                'name': 'HAXP9m', 
+                                'pl': 'tw', 
+                                't': '1760144204416', 
+                                'a': '',
+                                'msg': 'ItsBoshyTime'
+                            }
                         
                         parts["name"]=parts["display-name"]
                         del parts["display-name"]
@@ -86,7 +126,7 @@ def run():
                         del parts["tmi-sent-ts"]
                         parts["a"] = ""
                         
-                        print(mail)   
+                        #print(mail)   
                         
                         test = text[1].split("\n")
                         if len(test) > 1 :
@@ -97,7 +137,10 @@ def run():
                         else:
                             #ho("translate",text)                             
                             print("[Twitch] \033[0;35m",parts["name"],"\033[0;39m:", text[1])
-                        parts["msg"] = text[1]    
+                        parts["msg"] = text[1]   
+                        parts["emotes"] = parse_emotes_tag(parts["emotes"],parts["msg"])
+                        print(parts["emotes"]) 
+                        
                         app_data.add_com(parts)
                         #print(app_data.com)    
                         #app_data.modules["AI_translate"]["module"].aitr.translate(text[1])

@@ -1,12 +1,17 @@
 import threading
+import multiprocessing
 import os
+import time
 os.environ['HF_HOME'] = os.getcwd() + "/cache/huggingface"
+
+
 
 
 
 
 class AppData:
     def __init__(self):
+        self.com_queue = multiprocessing.Queue()
         self.com = [] # помойка комментариев
         self.stop = False
         self._lock = threading.Lock()  # блокируем доступ для потокобезопасности
@@ -16,6 +21,7 @@ class AppData:
         self.required_funcs = ["run", "save", "load"]
         self.modules = {}
         self.threads = {}
+        self.multiprocess = {}
         self.hooks = {}
         # шаблоны для чата для консоли и нейронки
         self.com_Prep = {
@@ -25,6 +31,15 @@ class AppData:
         }
         # список элементов в сообщении чата
         self.com_keys = ["name", "id", "pl", "t", "a","msg"]
+    
+    def queue_process_messages(self):
+        """Обрабатывает входящие данные из очереди."""
+        while True:
+            msg = self.com_queue.get()
+            if msg is None:
+                break
+            #print(f"[QUEUE] {msg['name']}: {msg['msg']}")
+            self.add_com(msg)
     
     def add_com(self,msg, uid = None):
         
@@ -56,9 +71,14 @@ class AppData:
             a[v](*args, **kwargs)
             
     def add_threads(self, func, name):
-        t = threading.Thread(target=func, daemon=True)
-        t.start()
+        t = threading.Thread(target=func, daemon=True).start()
         self.threads[name]=t
+            
+    def add_multiprocess(self, func, name):
+        #t = multiprocessing.Process(target=func, daemon=True)
+        com_queue=self.com_queue
+        t = multiprocessing.Process(target=func, daemon=True , args=(com_queue,)).start()
+        self.multiprocess[name]=t
             
     def add_mod(self, mod):
         with self._lock:  
@@ -83,7 +103,10 @@ class AppData:
 # создаём глобальный объект
 app_data = AppData()
 
-
+# запускаем в потоке нюхатель очереди queue обеспечивающий обмен данными 
+print('[queue_com] подготовка')
+threading.Thread(target=app_data.queue_process_messages, daemon=True).start()
+print('[queue_com] OK')
 
 
 

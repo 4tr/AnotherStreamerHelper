@@ -142,8 +142,8 @@ def module_select_checker(mod,name):
 def get_plugin_info(info, name = "WTF 0_o"):
     if info == None:
             return {"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"}  
-    info['autorun'] = info.get("autorun",False)    
-    info['thread'] = info.get("thread",False)        
+    info['autorun'] = info.get("autorun",False)   
+    info['run_mode'] = info.get("run_mode",0)       
     info['first_load'] = info.get("first_load",False)
     if info['autorun'] == False:            
         return {"ok":False,"e":f"\033[43m \033[49m \033[33mМодуль {name} помечен как не запускаемый автоматически \033[0;39m"}
@@ -198,8 +198,10 @@ def runner(name):
         print("\033[42m \033[0;39m запуск:<", name , "> \033[0;39m ")        
         mod = app_data.modules[name]["module"]
         info = app_data.modules[name]["info"]        
-        if info['thread'] == True:
+        if info['run_mode'] == 1:
             app_data.add_threads(mod.run,name)
+        elif info['run_mode'] == 2:
+            app_data.add_multiprocess(mod.run,name)
         else:    
             mod.run()
     

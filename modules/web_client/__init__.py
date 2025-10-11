@@ -5,8 +5,10 @@ __plugin__ = {
     "type": "web" ,
     "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # переносит модуль в список загружаемых в первую очередь
-    "thread": False   # нужно для модулей которые имеют собственные бесконечные циклы дабы не фризить работу кода
+    "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
+ifProxy =False
+
 
 from data import app_data
 ho = app_data.hook
@@ -38,8 +40,8 @@ def web_wind(url = "",win_name = ""):
         
 # запускается после помещения модуль в список загруженных модулей (приложения) 
 def run():   
-     
-    #os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--proxy-server=socks5://localhost:8888"
+    if ifProxy:
+        os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--proxy-server=socks5://localhost:8888"
     windows_app = QApplication(sys.argv)        
     cm = web_wind("http://"+IP+":"+str(PORT)+"/comments","Коментарии")            
     print("["+__name__.split(".")[-1]+"] OK")  
