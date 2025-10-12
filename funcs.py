@@ -68,6 +68,9 @@ def install(package):
 def uninstall(package):
     subprocess.check_call([sys.executable, "-m", "pip", "uninstall", package])
 
+
+ # uninstall("TensorFlow")
+ # exit()
 import importlib
 
 def require(package, pip_name=None):
@@ -243,13 +246,20 @@ def load_all_modules(path=app_data.module_dir):
     for name in valid_first:
         r = lmd(name, package=path) 
         if r["ok"] == True:
-            loader(r["mod"],name,True)        
+            loader(r["mod"],name,True)              
+        else:
+            valid_first.remove(name)
+            print(r["e"]) #"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"
+             
             
     #теперь пройдемся по модулям без пометки first_load или с false
     for name in valid_other:
         r = lmd(name, package=path)        
         if r["ok"] == True:
             loader(r["mod"],name,False)        
+        else:
+            valid_other.remove(name)
+            print(r["e"])    
 
     runWebWindow = False
     #запуск функций модулей

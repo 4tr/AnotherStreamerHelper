@@ -42,13 +42,16 @@ class AppData:
             self.add_com(msg)
     
     def add_com(self,msg, uid = None):
+        #print("[pre HOOK]",msg['msg'])        
+        self.hook("add_com",msg)
+        #print("[post HOOK]",msg['msg'])
         
         if uid == None:        
             params = msg.copy()
         else:
             if (uid != "AI") and (uid != "Bot") and (uid != "Console"):
                 return
-            params = comPrep[uid].copy()
+            params = self.comPrep[uid].copy()
             params['msg']=str(msg[msg])
         
         params["nn"]=len(self.com)           
@@ -66,9 +69,12 @@ class AppData:
         self.hooks[name_hook][modulename]=hookfunc
         
     def hook(self, hook_name,*args, **kwargs):
-        a = self.hooks.get(hook_name,{})        
-        for v in a:
-            a[v](*args, **kwargs)
+        try:
+            a = self.hooks.get(hook_name,{})        
+            for v in a:
+                a[v](*args, **kwargs)
+        except Exception as e:  
+            print("[HOOK ",hook_name,"] Error ",e)        
             
     def add_threads(self, func, name):
         t = threading.Thread(target=func, daemon=True).start()

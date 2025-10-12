@@ -9,6 +9,7 @@ __plugin__ = {
 
 #import websockets
 import socket
+import requests
 
 channel = 'arti9m'  # канал указывать без '#'
 nickname = f"justinfan67420"  # Анонимный ник для чтения
@@ -28,26 +29,52 @@ def get_global_emotes(client_id, token):
     data = resp.json()
     # `data["data"]` — список эмодзи, каждый c полями id, name, images
     return data["data"]
+
+def sort_emote_item(ee):
+    if len(ee) == 0:
+        return []
+    e = ee.copy()
+    ret = []
+    ret.append(e[0])
+    del e[0]
+    #print("___")
+    #print(e)
+    if len(e) == 0:
+        return ret
+    for ki,i in enumerate(e): 
+        #print('__',i)           
+        for kr,r in enumerate(ret):    
+            if i[1] > r[2]:
+                #print("-", kr, i)
+                
+                ret.insert(kr,i)
+                #del e[ki]
+                break
+    return ret
+
 def parse_emotes_tag(emotes_tag, message_text):
     """
     emotes_tag: строка как "25:0-4,1902:6-10"
     message_text: полный текст сообщения
     Возвращает список кортежей (emote_id, start_idx, end_idx, emote_text)
     """
+    #print(emotes_tag)
+    #print(message_text)
     result = []
     if not emotes_tag:
-        return result
-    for part in emotes_tag.split('/'):  # иногда несколько наборов через '/'
-        for pair in part.split(','):
-            if not pair:
+        return result    
+    
+    for item in emotes_tag.split('/'):  # иногда несколько наборов через '/' 
+        #print("pair",pair)
+        emote_id, ranges = item.split(':')
+        for rang in ranges.split(','):            
+            if not rang:
                 continue
-            emote_id, ranges = pair.split(':')
-            for rang in ranges.split(','):
-                start, end = rang.split('-')
-                start = int(start)
-                end = int(end)
-                emote_text = message_text[start:end+1]
-                result.append((emote_id, start, end, emote_text))
+            start, end = rang.split('-')
+            start = int(start)
+            end = int(end)
+            emote_text = message_text[start:end+1]
+            result.append((emote_id, start, end, emote_text))
     return result
 
 def run():
@@ -137,11 +164,26 @@ def run():
                         else:
                             #ho("translate",text)                             
                             print("[Twitch] \033[0;35m",parts["name"],"\033[0;39m:", text[1])
-                        parts["msg"] = text[1]   
+                        parts["msg"] = text[1] 
                         parts["emotes"] = parse_emotes_tag(parts["emotes"],parts["msg"])
-                        print(parts["emotes"]) 
-                        
+                        #print(parts["emotes"])    
+                        ee = parts["emotes"]
+                        #print(parts["emotes"])
+                        #[('160402', 0, 7, 'SabaPing'), ('emotesv2_5d523adb8bbb4786821cd7091e47da21', 9, 15, 'PopNemo'), ('133468', 17, 28, 'ItsBoshyTime')]
+                        ee = sort_emote_item(ee)                                              
+                        for i in ee:
+                            ib = i[1]
+                            ie = i[2] + 1   
+                            #print(parts['msg'][ie:])
+                            #if ie == (len(parts['msg'])):
+                            #    print("ok!!!!!!!!")
+                            #    exit()
+                            parts['msg']= parts['msg'][:ie] + '">' + parts['msg'][ie:]
+                            parts['msg']= parts['msg'][:ib] + '<id="' + i[0]+ '" name="' + parts['msg'][ib:]
+                            
+
                         app_data.add_com(parts)
+                        
                         #print(app_data.com)    
                         #app_data.modules["AI_translate"]["module"].aitr.translate(text[1])
                         

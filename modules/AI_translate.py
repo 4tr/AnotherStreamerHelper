@@ -9,6 +9,7 @@ __plugin__ = {
 
 from transformers import pipeline
 from langdetect import detect
+import torch #нужно для автоустановки зависимостей при запуске модуля!!!
 
 class AiTr:
     def __init__(self):
@@ -17,16 +18,16 @@ class AiTr:
             task="translation",
             model="facebook/nllb-200-distilled-600M",   
             tgt_lang="rus_Cyrl",
-            device=0  # если есть GPU
+            #device=0  # если есть GPU
         )     
         
-    def translate(self, text):
+    def translate(self, msg):
         
         #with self._lock: 
-            src = detect(text[1])  # вернёт 'fr'
+            src = str(detect(msg["msg"]))  # вернёт 'fr'
             #print("SRC:",src)
             if src == "ru":
-                text[1] = "[" + src + "] " + text[1]
+                msg["msg"] = "[" + src + "] " + msg["msg"]
                 return
             lang_map = {
                 "en": "eng_Latn",
@@ -40,14 +41,14 @@ class AiTr:
             src_lang = lang_map.get(src, "eng_Latn")
             #print("SRC_LANG:",src_lang)
             
-            tr= self.translator(text[1],src_lang=src_lang)
+            tr= self.translator(str(msg["msg"]),src_lang=src_lang)
             #print("[AI translate] ", tr[0]["translation_text"])
-            text[1] = "[" + src + "] " +tr[0]["translation_text"]
+            msg["msg"] = "[" + src + "] " +tr[0]["translation_text"]
             
 aitr=AiTr();  
  
 class hook:
-    def translate(data):
+    def add_com(data):
         aitr.translate(data)
     #def test_text_modificator(data):
     #    return "[HOOK]" + data

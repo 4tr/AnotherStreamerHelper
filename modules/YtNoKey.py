@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "Youtube chat parser no token",
     "description": "Парсер чата без токенов",
     "type": "chat" ,
-    "autorun" : True,
+    "autorun" : False,
     "run_mode": 2 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
 ifProxy = False
@@ -47,7 +47,8 @@ def run(com_queue):
             parts["ChatOwner"]=c.author.isChatOwner
             parts["ChatSponsor"]=c.author.isChatSponsor
             parts["ChatModerator"]=c.author.isChatModerator
-            com_queue.put(parts)
+            com_queue.put(parts)    # такой код для модуля работающего в режиме multiprocessing
+            # app_data.add_com(parts)  а такой в режиме thread
             #print(parts)            
         #author.badgeUrl
         #author.type

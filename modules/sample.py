@@ -8,6 +8,7 @@ __plugin__ = {
     "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
 
+
 # не обязательно, но необходимо для того чтобы предоставить другим модулям "точку входа" в виде хуков
 from data import app_data
 ho = app_data.hook
