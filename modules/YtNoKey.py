@@ -2,10 +2,10 @@ __plugin__ = {
     "name": "Youtube chat parser no token",
     "description": "Парсер чата без токенов",
     "type": "chat" ,
-    "autorun" : False,
+    "autorun" : True,
     "run_mode": 2 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
-ifProxy = False
+ifProxy = True
 
 import httpx
 import socksio
@@ -15,7 +15,7 @@ ho = app_data.hook
 
 
 def run(com_queue):
-    video_id="CRLxeCk7lTY"
+    video_id="----------------"
 
     if ifProxy:
         proxy = httpx.Proxy("socks5://127.0.0.1:8888")
@@ -28,7 +28,7 @@ def run(com_queue):
 
     while chat.is_alive():
         for c in chat.get().sync_items():
-            print(f"[Youtube] {c.author.name}: {c.message}")
+            #print(f"[Youtube] {c.author.name}: {c.message}")  
             
             #tmp = c.author.__dict__.items()
             #for i in tmp:
@@ -47,6 +47,18 @@ def run(com_queue):
             parts["ChatOwner"]=c.author.isChatOwner
             parts["ChatSponsor"]=c.author.isChatSponsor
             parts["ChatModerator"]=c.author.isChatModerator
+            msg = ""
+            msg_con = ""
+            for i in parts["messageEx"]:
+                if type(i) is str: 
+                    msg_con = msg_con + i
+                    msg = msg + i
+                else:
+                    msg_con = msg_con + "[i]"
+                    msg = msg + "<img src=\"" + i['url']+"\" id=\""+ i['id'] +"\" title=\""+ i["txt"] +"\">"                    
+            parts['msg'] = msg                    
+                      
+            print(f"[Youtube]",parts["name"],":",msg_con)            
             com_queue.put(parts)    # такой код для модуля работающего в режиме multiprocessing
             # app_data.add_com(parts)  а такой в режиме thread
             #print(parts)            

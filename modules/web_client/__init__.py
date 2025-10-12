@@ -7,7 +7,7 @@ __plugin__ = {
     "first_load": False, # переносит модуль в список загружаемых в первую очередь
     "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
-ifProxy =False
+ifProxy =True
 
 
 from data import app_data
