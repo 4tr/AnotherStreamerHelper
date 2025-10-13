@@ -15,7 +15,7 @@ ho = app_data.hook
 
 
 def run(com_queue):
-    video_id="----------------"
+    video_id="6_LPooKcrOg"
 
     if ifProxy:
         proxy = httpx.Proxy("socks5://127.0.0.1:8888")
@@ -54,9 +54,9 @@ def run(com_queue):
                     msg_con = msg_con + i
                     msg = msg + i
                 else:
-                    msg_con = msg_con + "[i]"
                     msg = msg + "<img src=\"" + i['url']+"\" id=\""+ i['id'] +"\" title=\""+ i["txt"] +"\">"                    
             parts['msg'] = msg                    
+            parts['clear_msg'] = msg_con                    
                       
             print(f"[Youtube]",parts["name"],":",msg_con)            
             com_queue.put(parts)    # такой код для модуля работающего в режиме multiprocessing

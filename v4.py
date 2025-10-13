@@ -8,21 +8,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 print("[CORE] INIT")
 import time
 import funcs

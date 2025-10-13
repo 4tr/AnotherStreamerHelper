@@ -34,6 +34,14 @@ def index():
 def comments():    
     return render_template("com.html")
 
+@app.route("/modules", methods=["GET", "POST"])
+def modules_web():    
+    m = app_data.modules
+    
+    #print(app_data.get_process_module("YtNoKey"))
+    
+    return render_template("modules.html",m=app_data)
+
 @app.route("/get")
 def get():    
     last = int(request.args.get("last", ""))

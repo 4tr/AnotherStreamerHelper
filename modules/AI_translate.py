@@ -24,10 +24,10 @@ class AiTr:
     def translate(self, msg):
         
         #with self._lock: 
-            src = str(detect(msg["msg"]))  # вернёт 'fr'
+            src = str(detect(msg["clear_msg"]))  # вернёт 'fr'
             #print("SRC:",src)
             if src == "ru":
-                msg["msg"] = "[" + src + "] " + msg["msg"]
+                msg["translate"] = "[" + src + "] " + msg["clear_msg"]
                 return
             lang_map = {
                 "en": "eng_Latn",
@@ -41,9 +41,9 @@ class AiTr:
             src_lang = lang_map.get(src, "eng_Latn")
             #print("SRC_LANG:",src_lang)
             
-            tr= self.translator(str(msg["msg"]),src_lang=src_lang)
+            tr= self.translator(str(msg["clear_msg"]),src_lang=src_lang)
             #print("[AI translate] ", tr[0]["translation_text"])
-            msg["msg"] = "[" + src + "] " +tr[0]["translation_text"]
+            msg["translate"] = "[" + src + "] " +tr[0]["translation_text"]
             
 aitr=AiTr();  
  

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>index</title>
+  
+</head>
+<body>
+  {% for i in m.modules %}
+    <div>[<a href="/modules?m={{ i }}">{{ i }}</a>] {{ m.modules[i]['info']['name']}} {% if m.get_process_module(i) != None %}[A]{% endif %}</div>  
+  {% endfor %}
+  
+</body>
+</html>

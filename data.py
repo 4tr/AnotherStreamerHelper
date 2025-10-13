@@ -77,15 +77,28 @@ class AppData:
             print("[HOOK ",hook_name,"] Error ",e)        
             
     def add_threads(self, func, name):
-        t = threading.Thread(target=func, daemon=True).start()
+        t = threading.Thread(target=func, daemon=True)
+        t.start()
         self.threads[name]=t
             
     def add_multiprocess(self, func, name):
         #t = multiprocessing.Process(target=func, daemon=True)
         com_queue=self.com_queue
-        t = multiprocessing.Process(target=func, daemon=True , args=(com_queue,)).start()
+        t = multiprocessing.Process(target=func, daemon=True , args=(com_queue,))
+        t.start()
         self.multiprocess[name]=t
-            
+        
+    def get_process_module(self,module_name):
+        m = self.modules[module_name]
+        if m['info']['run_mode'] == 1:
+            return self.threads[module_name]
+        if m['info']['run_mode'] == 2:
+            return self.multiprocess[module_name]
+        if m['info']['run_mode'] == 0:
+            return None
+        
+        
+                
     def add_mod(self, mod):
         with self._lock:  
             self.modules[mod['name']]=mod

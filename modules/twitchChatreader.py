@@ -170,7 +170,8 @@ def run():
                         ee = parts["emotes"]
                         #print(parts["emotes"])
                         #[('160402', 0, 7, 'SabaPing'), ('emotesv2_5d523adb8bbb4786821cd7091e47da21', 9, 15, 'PopNemo'), ('133468', 17, 28, 'ItsBoshyTime')]
-                        ee = sort_emote_item(ee)                                              
+                        ee = sort_emote_item(ee) 
+                        msg_con = parts['msg']                                             
                         for i in ee:
                             ib = i[1]
                             ie = i[2] + 1   
@@ -178,10 +179,13 @@ def run():
                             #if ie == (len(parts['msg'])):
                             #    print("ok!!!!!!!!")
                             #    exit()
+                            # заворачивание иконок в теги
                             parts['msg']= parts['msg'][:ie] + '">' + parts['msg'][ie:]
                             parts['msg']= parts['msg'][:ib] + '<id="' + i[0]+ '" name="' + parts['msg'][ib:]
+                            #удаление иконок из текста на перевод
+                            msg_con = msg_con[:ib] + msg_con[(ie + 1):]
                             
-
+                        parts['clear_msg'] = msg_con
                         app_data.add_com(parts)
                         
                         #print(app_data.com)    

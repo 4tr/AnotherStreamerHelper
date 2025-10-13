@@ -274,6 +274,12 @@ def load_all_modules(path=app_data.module_dir):
         else:    
             runner(name)     
     
+    #print(app_data.multiprocess)
+    #print(app_data.get_process_module("YtNoKey"))
+    
+    #exit()
+    
+    
     #костыль!!!
     if runWebWindow :
         runner("web_client")
