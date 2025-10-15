@@ -1,7 +1,9 @@
 import threading
 import multiprocessing
 import os
+import sys
 import time
+import json
 os.environ['HF_HOME'] = os.getcwd() + "/cache/huggingface"
 
 
@@ -31,7 +33,48 @@ class AppData:
         }
         # список элементов в сообщении чата
         self.com_keys = ["name", "id", "pl", "t", "a","msg"]
-    
+    def get_config_v2(self, module_name , cfg_name = "default"):
+        cfg = self.get_cfg(module_name,cfg_name)    
+        if cfg == None:
+            return cfg
+        ret = {}
+        for i in cfg:
+            ret[i]=cfg[i]['value']
+        return ret    
+        
+    def get_cfg(self, module_name , cfg_name = "default"):
+        ## todo костыль с точками. нужно получать иначе
+        name = module_name.replace(self.module_dir + ".","")
+        otn = module_name.replace(".","/")
+        t = __file__.split("/")
+        root = '/'.join(t[:len(t)-1])
+        addr = root+"/"+otn
+        work_dir =root + "/" + self.module_dir
+        f_cfg_name = cfg_name
+        if os.path.isdir(addr):
+            work_dir=addr + "/cfg"         
+        else:            
+            f_cfg_name = name + "_" + cfg_name
+        file = work_dir + "/" + f_cfg_name + ".json"
+        #print("FILE - ", file)    
+        if os.path.exists(file):
+            with open(file, "r") as f:
+                cfg = json.load(f)
+                f.close()
+            return cfg  
+        else:
+            mod = self.modules[name]["module"]
+            ret = getattr(mod, "cfg", None)
+            if ret == None: 
+                print("[",name,"] not cfg file and class 0_o return None")
+            else:
+                ret = getattr(ret, cfg_name, None)
+                if  ret == None: 
+                    print("[",name,"] not find [",cfg_name,"] in cfg class 0_о")
+                else:
+                    return ret
+                                       
+        return None
     def queue_process_messages(self):
         """Обрабатывает входящие данные из очереди."""
         while True:

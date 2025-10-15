@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Config Editor</title>
+</head>
+<body>
+    <h2>Настройки</h2>
+    <form id="configForm"></form>
+    <button onclick="saveData()">Сохранить</button>
+
+    <script>
+		let data = {}
+        async function loadData() {
+            let params = new URLSearchParams(document.location.search);
+            let m = params.get('m');
+            let response = await fetch("/conf?m=" + m + "&get");
+            data = await response.json();
+
+            let form = document.getElementById("configForm");
+            form.innerHTML = "";
+
+			for (const k in data){
+            //data.forEach((item) => {
+				item=data[k];
+				let div = document.createElement("div");
+                let label = document.createElement("label");
+                label.textContent = item.label + ": ";
+				
+                let input = document.createElement("input");
+                input.name = item.name;
+                input.id = item.name;
+                input.type = item.type;
+                if (item.type === "checkbox") {
+                    input.checked = item.value;
+                } else {
+                    input.value = item.value;
+                }				
+                label.appendChild(input);
+				div.appendChild(label);
+                form.appendChild(div);
+                //form.appendChild(document.createElement("br"));
+            //});
+			}
+        }
+
+        async function saveData() {
+			for (const k in data){
+            //data.forEach((item) => {
+				item=data[k];			
+                let el = document.getElementById(item.name);				
+				
+                if (item.type === "checkbox") {
+                    item.value = el.checked;
+                } else {
+					if (item.type === "number")
+					{	
+						item.value = Number(el.value)  ;
+					}else{
+						item.value = el.value ;
+					}
+                    
+                }
+				
+            //});
+			}
+            let params = new URLSearchParams(document.location.search);
+            let m = params.get('m');
+				
+            let response = await fetch("/conf?m="+m+"&save", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(data)
+            });
+
+            let result = await response.json();
+            //alert("Сохранено: " + JSON.stringify(result));
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

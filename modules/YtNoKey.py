@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "Youtube chat parser no token",
     "description": "Парсер чата без токенов",
     "type": "chat" ,
-    "autorun" : True,
+    "autorun" : False,
     "run_mode": 2 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
 ifProxy = True
@@ -15,7 +15,7 @@ ho = app_data.hook
 
 
 def run(com_queue):
-    video_id="6_LPooKcrOg"
+    video_id="4-hSiYfoaLY"
 
     if ifProxy:
         proxy = httpx.Proxy("socks5://127.0.0.1:8888")

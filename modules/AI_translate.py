@@ -4,7 +4,7 @@ __plugin__ = {
     "type": "text_modificator" ,
     "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
     "first_load": True,
-    "autorun": False
+    "autorun": True
 }
 
 from transformers import pipeline
@@ -44,6 +44,7 @@ class AiTr:
             tr= self.translator(str(msg["clear_msg"]),src_lang=src_lang)
             #print("[AI translate] ", tr[0]["translation_text"])
             msg["translate"] = "[" + src + "] " +tr[0]["translation_text"]
+            print("[HOOK translate]",msg["translate"])
             
 aitr=AiTr();  
  

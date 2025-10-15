@@ -2,18 +2,25 @@ __plugin__ = {
     "name": "Twitch chat reader",
     "description": "Получает коменты с чатика на твиче",
     "type": "chat",
-    "autorun":False,
+    "autorun":True,
     "run_mode": 1 #0 - standart,  1 - thread, 2 - multiprocessing      
 }
 
+class cfg():
+    default = {
+        "channel": {
+        "label": "Отслеживаемый канал",
+        "name": "channel",
+        "type": "text",
+        "value": "arti9m"
+        }  
+    }
 
 #import websockets
 import socket
 import requests
+import os
 
-channel = 'arti9m'  # канал указывать без '#'
-nickname = f"justinfan67420"  # Анонимный ник для чтения
-token = 'SCHMOOPIIE'  
  
 import ssl
 from data import app_data
@@ -89,6 +96,18 @@ def run():
     #token = 'oauth:xxxxxxxxxxxxxxxxxxxxxx'  # получить на twitchapps.com/tmi
     
     
+    cfg = app_data.get_config_v2(__name__)
+    #print(cfg)
+    #print("_____________________________")
+    #print(os.path.dirname(os.path.realpath(__file__)))
+    #print(__file__)
+    
+    #print(cfg)
+    
+    #channel = 'haxp9m'  # канал указывать без '#'
+    channel = cfg["channel"]
+    nickname = f"justinfan67420"  # Анонимный ник для чтения
+    token = 'SCHMOOPIIE'  
     
 
     sock = socket.socket()

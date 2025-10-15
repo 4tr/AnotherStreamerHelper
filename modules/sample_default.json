@@ -1,0 +1,38 @@
+{
+  "govorilkaOn": {
+    "label": "\u0413\u043e\u0432\u043e\u0440\u0438\u043b\u043a\u0430",
+    "name": "govorilkaOn",
+    "type": "checkbox",
+    "value": true
+  },
+  "AI": {
+    "label": "\u0414\u0443\u043c\u0430\u0442\u0435\u043b\u044c",
+    "name": "AI",
+    "type": "checkbox",
+    "value": true
+  },
+  "username": {
+    "label": "1",
+    "name": "username",
+    "type": "text",
+    "value": "admin"
+  },
+  "timeout": {
+    "label": "2",
+    "name": "timeout",
+    "type": "number",
+    "value": 666
+  },
+  "debug": {
+    "label": "3",
+    "name": "debug",
+    "type": "checkbox",
+    "value": true
+  },
+  "jop": {
+    "label": "jop",
+    "name": "jop",
+    "type": "checkbox",
+    "value": false
+  }
+}

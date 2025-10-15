@@ -7,7 +7,7 @@
 </head>
 <body>
   {% for i in m.modules %}
-    <div>[<a href="/modules?m={{ i }}">{{ i }}</a>] {{ m.modules[i]['info']['name']}} {% if m.get_process_module(i) != None %}[A]{% endif %}</div>  
+    <div>[<a href="/config?m={{ i }}">{{ i }}</a>] {{ m.modules[i]['info']['name']}} {% if m.get_process_module(i) != None %}[A]{% endif %}</div>  
   {% endfor %}
   
 </body>

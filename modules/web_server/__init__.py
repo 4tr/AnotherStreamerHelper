@@ -34,12 +34,75 @@ def index():
 def comments():    
     return render_template("com.html")
 
-@app.route("/modules", methods=["GET", "POST"])
-def modules_web():    
+@app.route('/config')
+def config():
+    return render_template("config.html")  
+
+@app.route("/conf", methods=['GET', 'POST'])
+def conf_get():
     m = app_data.modules
+    mod_name = request.args.get("m")    
+    if mod_name is not None:
+        if mod_name in m:
+            #app_data.get_cfg()
+            cfg = app_data.get_cfg(app_data.module_dir+"."+mod_name)
+        else:
+            cfg = None        
+    else:        
+        cfg = None
+    #print(cfg)
+    #print(mod_name)
+    if request.args.get("get") is not None:
+        return jsonify(cfg)    
     
+    if request.args.get("save") is not None:
+        if mod_name is None:
+            return False
+        print("debug4" , mod_name)
+        
+        new_data = request.json
+        print(new_data)
+        return "KEKW"
+        # обновляем значения
+        #for item in cfg:
+        upd = False
+        for key, item in cfg.items():   
+            print(item["name"])
+            if new_data[item["name"]]["name"] is not None:
+                print("22")
+                if (item["value"] == new_data[item["name"]]["value"]):
+                    print(item["name"] + " : сохранение не требуется")
+                else:
+                    upd=True
+                    cfg[item["name"]]["value"] = new_data[item["name"]]["value"]
+                    print(item["name"] + " : свежак")
+                        
+                #val = new_data[item["name"]]
+                # привести типы
+                #if item["type"] == "number":
+                ##    item["value"] = int(val)
+                #elif item["type"] == "checkbox":
+                #    item["value"] = bool(val)
+                #else:
+                #    item["value"] = str(val)
+               # sv_conf()
+        return jsonify(cfg)
+    
+    
+@app.route("/module", methods=["GET", "POST"])
+def module_web():
+       
+    m = app_data.modules
+    mod_name = request.args.get("m")
+    if mod_name is not None:
+        if mod_name in m:
+            #app_data.get_cfg()
+            cfg = app_data.get_cfg(app_data.module_dir+"."+mod_name)
+                
+        
+@app.route("/modules", methods=["GET", "POST"])
+def modules_web():   
     #print(app_data.get_process_module("YtNoKey"))
-    
     return render_template("modules.html",m=app_data)
 
 @app.route("/get")

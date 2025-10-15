@@ -8,8 +8,19 @@ __plugin__ = {
     "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
 
+class cfg():
+    default = {
+            "channel": {
+            "label": "описание параментра",
+            "name": "channel",
+            "type": "text",
+            "value": "ЫЫЫЫЫ"
+        }  
+}
+
 # не обязательно, но необходимо для того чтобы предоставить другим модулям "точку входа" в виде хуков
 from data import app_data
+import os
 ho = app_data.hook
 
 class hook:
@@ -20,9 +31,19 @@ class hook:
         print("Привет из хука test_hook_two тестового модуля2 ", data)
         return # !!! ВАЖНО указать в каждой функции хука. если вывод не писать хук будет забракован при загрузке
 
-        
+print("__________________________",__name__ ,"__________")        
 # запускается после помещения модуля в список загруженных модулей (приложения) 
-def run():    
+def run():  
+    print(os.path.dirname(os.path.realpath(__file__)))
+    print(__file__)
+    
+    
+    
+   
+    cfg = app_data.get_cfg(__name__)
+    #print(cfg)
+    #exit()
+      
     print("["+__name__.split(".")[-1]+"] OK")    
     print(" а теперь чтобы окончателно запутать тебя ")    
     text = "---данные с модуля2---"

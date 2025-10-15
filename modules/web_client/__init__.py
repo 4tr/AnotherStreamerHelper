@@ -43,8 +43,8 @@ def run():
     if ifProxy:
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--proxy-server=socks5://localhost:8888"
     windows_app = QApplication(sys.argv)        
-    cm = web_wind("http://"+IP+":"+str(PORT)+"/comments","Коментарии")            
-    #md = web_wind("http://"+IP+":"+str(PORT)+"/modules","Модули")            
+    #cm = web_wind("http://"+IP+":"+str(PORT)+"/comments","Коментарии")            
+    md = web_wind("http://"+IP+":"+str(PORT)+"/modules","Модули")            
     print("["+__name__.split(".")[-1]+"] OK")  
     #windows_app.exec_()                  
     sys.exit(windows_app.exec_())
