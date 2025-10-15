@@ -8,14 +8,15 @@ __plugin__ = {
     "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
 
-class cfg():
-    default = {
-            "channel": {
+__cfg__ ={
+    "default" : {
+        "channel": {
             "label": "описание параментра",
             "name": "channel",
             "type": "text",
             "value": "ЫЫЫЫЫ"
         }  
+    }
 }
 
 # не обязательно, но необходимо для того чтобы предоставить другим модулям "точку входа" в виде хуков

@@ -45,7 +45,8 @@ def conf_get():
     if mod_name is not None:
         if mod_name in m:
             #app_data.get_cfg()
-            cfg = app_data.get_cfg(app_data.module_dir+"."+mod_name)
+            #cfg = app_data.get_cfg(app_data.module_dir+"."+mod_name)
+            cfg = app_data.get_cfg(mod_name)
         else:
             cfg = None        
     else:        
@@ -62,7 +63,7 @@ def conf_get():
         
         new_data = request.json
         print(new_data)
-        return "KEKW"
+        #return "KEKW"
         # обновляем значения
         #for item in cfg:
         upd = False
@@ -85,7 +86,9 @@ def conf_get():
                 #    item["value"] = bool(val)
                 #else:
                 #    item["value"] = str(val)
-               # sv_conf()
+        if upd:
+            app_data.save_cfg(mod_name, cfg)
+                #sv_conf()
         return jsonify(cfg)
     
     

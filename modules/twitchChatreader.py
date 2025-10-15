@@ -6,15 +6,16 @@ __plugin__ = {
     "run_mode": 1 #0 - standart,  1 - thread, 2 - multiprocessing      
 }
 
-class cfg():
-    default = {
+__cfg__={
+    "default": {
         "channel": {
-        "label": "Отслеживаемый канал",
-        "name": "channel",
-        "type": "text",
-        "value": "arti9m"
+            "label": "Отслеживаемый канал",
+            "name": "channel",
+            "type": "text",
+            "value": "arti9m"
         }  
     }
+}
 
 #import websockets
 import socket

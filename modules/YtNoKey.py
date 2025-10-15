@@ -5,6 +5,18 @@ __plugin__ = {
     "autorun" : False,
     "run_mode": 2 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
+
+__cfg__={
+    "default": {
+        "video_id": {
+            "label": "Идентификатор свидео",
+            "name": "video_id",
+            "type": "text",
+            "value": "KOT-666"
+        }  
+    }
+}
+
 ifProxy = True
 
 import httpx
@@ -15,8 +27,8 @@ ho = app_data.hook
 
 
 def run(com_queue):
-    video_id="4-hSiYfoaLY"
-
+    cfg = app_data.get_config_v2(__name__)
+    video_id=cfg["video_id"]
     if ifProxy:
         proxy = httpx.Proxy("socks5://127.0.0.1:8888")
         transport = httpx.HTTPTransport(proxy=proxy)

@@ -15,9 +15,10 @@ ho = app_data.hook
 
 import os,sys
 #web
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtGui import QIcon
 #import PyQtWebEngine 
 
 #proxy 
@@ -30,13 +31,40 @@ from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 IP="127.0.0.1"
 PORT = 5000
 
-def web_wind(url = "",win_name = ""):
+#def web_wind(url = "",win_name = ""):
+#    browser = QWebEngineView()
+#    browser.setWindowTitle(win_name)
+#    browser.resize(800, 600)
+#    browser.load(QUrl(url))
+#    browser.show()
+#    return browser
+def web_wind(url="", win_name=""):
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+
+    # Создаём главное окно
+    window = QMainWindow()
+    window.setWindowTitle(win_name)
+    window.resize(1000, 700)
+
+    # Устанавливаем иконку (можно .ico или .png)
+    icon_path = os.path.dirname(__file__) + "/img/icon.png"
+    
+    
+    print("------------------------",icon_path)
+    if os.path.exists(icon_path):
+        window.setWindowIcon(QIcon(icon_path))    
+
+    # Добавляем браузер внутрь
     browser = QWebEngineView()
-    browser.setWindowTitle(win_name)
-    browser.resize(800, 600)
     browser.load(QUrl(url))
-    browser.show()
-    return browser
+    window.setCentralWidget(browser)
+
+    window.show()
+
+    return app, window
+
         
 # запускается после помещения модуль в список загруженных модулей (приложения) 
 def run():   
@@ -44,7 +72,9 @@ def run():
         os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--proxy-server=socks5://localhost:8888"
     windows_app = QApplication(sys.argv)        
     #cm = web_wind("http://"+IP+":"+str(PORT)+"/comments","Коментарии")            
-    md = web_wind("http://"+IP+":"+str(PORT)+"/modules","Модули")            
+    #md = web_wind("http://"+IP+":"+str(PORT)+"/modules","Модули")     
+    windows_app, win = web_wind("http://"+IP+":"+str(PORT)+"/modules","Модули")
+    #sys.exit(windows_app.exec_())       
     print("["+__name__.split(".")[-1]+"] OK")  
     #windows_app.exec_()                  
     sys.exit(windows_app.exec_())

@@ -25,6 +25,13 @@ class AppData:
         self.threads = {}
         self.multiprocess = {}
         self.hooks = {}
+        self.updmarker = {"__upd__": {
+                                "label": "маркер обновленной конфигурапции",
+                                "name": "__upd__",                                
+                                "type": "h_bool",
+                                "value": True
+                            } 
+                          }
         # шаблоны для чата для консоли и нейронки
         self.com_Prep = {
             "Console" :{"name": "Console", "id": "Console", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/console.png", "msg" : ""},
@@ -41,11 +48,15 @@ class AppData:
         for i in cfg:
             ret[i]=cfg[i]['value']
         return ret    
+    
+    def cfg_predata(self, module_name , cfg_name = "default"):
+        ret = {}
+        #print("------------------------------",module_name)
+        ret["name"] = module_name.replace(self.module_dir + ".","")
+        #print("------------------------------",ret["name"])
         
-    def get_cfg(self, module_name , cfg_name = "default"):
-        ## todo костыль с точками. нужно получать иначе
-        name = module_name.replace(self.module_dir + ".","")
-        otn = module_name.replace(".","/")
+        #otn = module_name.replace(".","/")
+        otn = self.module_dir + "/" + ret["name"]
         t = __file__.split("/")
         root = '/'.join(t[:len(t)-1])
         addr = root+"/"+otn
@@ -54,21 +65,45 @@ class AppData:
         if os.path.isdir(addr):
             work_dir=addr + "/cfg"         
         else:            
-            f_cfg_name = name + "_" + cfg_name
-        file = work_dir + "/" + f_cfg_name + ".json"
+            f_cfg_name = ret["name"] + "_" + cfg_name
+        ret["file"] = work_dir + "/" + f_cfg_name + ".json"
+        return ret["name"],ret["file"]      
+    
+    def save_cfg(self, module_name , cfg, cfg_name = "default"): 
+        name,file= self.cfg_predata(module_name,cfg_name)
+        # первым делом залью то что попросили в файл
+        with open(file, "w") as fc:
+            json.dump(cfg, fc, indent=2)
+            fc.close()
+        #print("[core]["+name+"] save " + file)
+        # теперь для основных потоков обновить данные внутри модулей в переменной __cfg__
+        mod = self.modules[module_name]
+        if (mod["info"]["run_mode"] < 2): # прямое выполение или поток
+            try:
+                mod['module'].__cfg__[cfg_name]=cfg
+                mod['module'].__cfg__[cfg_name]=self.updmarker["__upd__"]
+                
+            except Exception as e:  
+                print("[CFG ",module_name,"] Error ",e)      
+        #это очень сырой вариант и тут очень много всего доделывать предстоит
+        
+    def get_cfg(self, module_name , cfg_name = "default"):
+        ## todo костыль с точками. нужно получать иначе
+        name,file= self.cfg_predata(module_name,cfg_name)
         #print("FILE - ", file)    
-        if os.path.exists(file):
+        #if os.path.exists(file):        
+        if os.path.isfile(file):
             with open(file, "r") as f:
                 cfg = json.load(f)
                 f.close()
             return cfg  
         else:
             mod = self.modules[name]["module"]
-            ret = getattr(mod, "cfg", None)
+            ret = getattr(mod, "__cfg__", None)
             if ret == None: 
                 print("[",name,"] not cfg file and class 0_o return None")
             else:
-                ret = getattr(ret, cfg_name, None)
+                ret = ret.get(cfg_name, None)
                 if  ret == None: 
                     print("[",name,"] not find [",cfg_name,"] in cfg class 0_о")
                 else:
