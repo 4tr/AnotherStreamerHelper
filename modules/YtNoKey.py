@@ -70,7 +70,7 @@ def run(com_queue):
             parts['msg'] = msg                    
             parts['clear_msg'] = msg_con                    
                       
-            print(f"[Youtube]",parts["name"],":",msg_con)            
+            print(f"["+__name__+"]",parts["name"],":",msg_con)            
             com_queue.put(parts)    # такой код для модуля работающего в режиме multiprocessing
             # app_data.add_com(parts)  а такой в режиме thread
             #print(parts)            

@@ -5,7 +5,7 @@ import sys
 import time
 import json
 os.environ['HF_HOME'] = os.getcwd() + "/cache/huggingface"
-
+os.environ["XDG_CACHE_HOME"] = os.getcwd() + "/cache/venv"
 
 
 
@@ -120,7 +120,9 @@ class AppData:
             self.add_com(msg)
     
     def add_com(self,msg, uid = None):
-        #print("[pre HOOK]",msg['msg'])        
+        #print("[pre HOOK]",msg['msg'])    
+        if msg.get("clear_msg",None) == None:
+            msg["clear_msg"]=msg["msg"]    
         self.hook("add_com",msg)
         #print("[post HOOK]",msg['msg'])
         
@@ -152,6 +154,7 @@ class AppData:
             for v in a:
                 a[v](*args, **kwargs)
         except Exception as e:  
+            print()
             print("[HOOK ",hook_name,"] Error ",e)        
             
     def add_threads(self, func, name):

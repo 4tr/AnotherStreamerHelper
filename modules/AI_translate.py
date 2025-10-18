@@ -4,7 +4,7 @@ __plugin__ = {
     "type": "text_modificator" ,
     "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
     "first_load": True,
-    "autorun": False
+    "autorun": True
 }
 
 from transformers import pipeline

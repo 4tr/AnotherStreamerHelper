@@ -9,10 +9,10 @@
        <script>
             let last = -1
             function co(d){
-	     let div = document.createElement('div');
+	    let div = document.createElement('div');
 			    div.innerHTML =`			    	
 			    	<div id="nn_${d.nn}">
-			    		<img src="${d.a}" width="50" height="50"/> ${d.name}:${d.msg}
+			    		<img src="${d.a}" width="50" height="50"/> ${d.name}:${d.msg}<div>${d.translate}</div>
 			    	</div>
 			    	`;			    
 		            return div.firstElementChild;

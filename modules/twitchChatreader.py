@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "Twitch chat reader",
     "description": "Получает коменты с чатика на твиче",
     "type": "chat",
-    "autorun":True,
+    "autorun":False,
     "run_mode": 1 #0 - standart,  1 - thread, 2 - multiprocessing      
 }
 
