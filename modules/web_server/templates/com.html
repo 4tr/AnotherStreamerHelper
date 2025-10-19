@@ -10,11 +10,14 @@
             let last = -1
             function co(d){
 	    let div = document.createElement('div');
-			    div.innerHTML =`			    	
-			    	<div id="nn_${d.nn}">
-			    		<img src="${d.a}" width="50" height="50"/> ${d.name}:${d.msg}<div>${d.translate}</div>
-			    	</div>
-			    	`;			    
+				t ='<div id="nn_' + d.nn + '"><img src="' + d.a + '" width="50" height="50"/>' + d.name + ':' + d.msg;
+					if (d.orig_lang != "ru")
+						{
+						if(typeof d.orig_lang !== "undefined")
+							{t = t + "<div>[" + d.orig_lang + "] "+d.translate + "</div>";}
+					}
+			    	t = t + "</div>";			    
+					div.innerHTML = t;
 		            return div.firstElementChild;
             }
             

@@ -3,7 +3,7 @@ __plugin__ = {
     "name": "Подслушивалка Whisper",
     "description": "STT whisper", 
     "type": "test" ,
-    "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
+    "autorun":False, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # в данном случае я указал False чтобы этот модуль загрузился позже и гарантировать что хук который о триггернет при запуске уже был задействован первым тестовым модулем 
     "run_mode": 1 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
@@ -26,7 +26,7 @@ def record_and_transcribe():
         audio = np.squeeze(audio)
         #print("Processing...")
         result = model.transcribe(audio, fp16=torch.cuda.is_available())
-        parts= {"name": "Whisper", "id": "Whisper", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/whisper.png", "msg" : ""}
+        parts= {"name": "Прослушка", "id": "Whisper", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/whisper.png", "msg" : ""}
         parts["msg"]=result["text"].strip()
         if len(parts["msg"]) > 0:
             print("["+__name__+"]",parts["msg"])

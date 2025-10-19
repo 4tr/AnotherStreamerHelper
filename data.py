@@ -124,6 +124,7 @@ class AppData:
         if msg.get("clear_msg",None) == None:
             msg["clear_msg"]=msg["msg"]    
         self.hook("add_com",msg)
+        self.hook("add_com_last",msg)
         #print("[post HOOK]",msg['msg'])
         
         if uid == None:        

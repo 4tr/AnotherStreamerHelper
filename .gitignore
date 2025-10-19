@@ -2,3 +2,5 @@
 /venv
 /cache
 test*
+/modules/silero_tts/voices/
+/modules/silero_tts/wav
