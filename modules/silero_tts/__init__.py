@@ -8,7 +8,7 @@ __plugin__ = {
     "name": "Говорилка Silero",
     "description": "TTS Silero", 
     "type": "test" ,
-    "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
+    "autorun":False, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # в данном случае я указал False чтобы этот модуль загрузился позже и гарантировать что хук который о триггернет при запуске уже был задействован первым тестовым модулем 
     "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
@@ -21,7 +21,8 @@ sample_rate = 48000
 
 device = torch.device('cpu')
 torch.set_num_threads(4)
-local_file = 'v3_en.pt'
+mod_dir = os.path.dirname(os.path.realpath(__file__))
+local_file = mod_dir + '/models/v3_en.pt'
 #if not os.path.isfile(local_file):
 #    torch.hub.download_url_to_file('https://models.silero.ai/models/tts/en/v3_en.pt',
 #                                   local_file)  
