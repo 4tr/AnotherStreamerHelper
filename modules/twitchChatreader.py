@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "Twitch chat reader",
     "description": "Получает коменты с чатика на твиче",
     "type": "chat",
-    "autorun":False,
+    "autorun":True,
     "run_mode": 1 #0 - standart,  1 - thread, 2 - multiprocessing      
 }
 
@@ -12,7 +12,7 @@ __cfg__={
             "label": "Отслеживаемый канал",
             "name": "channel",
             "type": "text",
-            "value": "arti9m"
+            "value": "KOT-666 "
         }  
     }
 }

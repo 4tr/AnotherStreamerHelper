@@ -2,15 +2,30 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+	<style>
+      div#com > div > div{        
+		display: contents;
+		font-weight: bolder;
+      }
+	  
+	  .yt {
+		color: #ff0033;
+	  }
+	  .tw {
+		color: #9147ff;
+	  }
+    </style>
 </head>
 <body>
+	<div style="color:red;font-size:10px">Attention! This is an automatic translation into Russian. Any inaccuracies should be considered accidental!</div>
+	<div style="color:red;font-size:10px">внимание! автоматический перевод на русский. Любые неточности считать случайными!</div>
 	<div id="com">	                              
     	</div>      	
        <script>
             let last = -1
             function co(d){
 	    let div = document.createElement('div');
-				t ='<div id="nn_' + d.nn + '"><img src="' + d.a + '" width="50" height="50"/>' + d.name + ':' + d.msg;
+				t ='<div id="nn_' + d.nn + '"><img src="' + d.a + '" width="50" height="50"/><div class="' + d.pl + ' author">' + d.name + '</div>:' + d.msg;
 					if (d.orig_lang != "ru")
 						{
 						if(typeof d.orig_lang !== "undefined")

@@ -1,18 +1,12 @@
-
-
-
-
-
 # обязательный блок описания
 __plugin__ = {
     "name": "Говорилка Silero",
     "description": "TTS Silero", 
     "type": "test" ,
-    "autorun":False, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
+    "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # в данном случае я указал False чтобы этот модуль загрузился позже и гарантировать что хук который о триггернет при запуске уже был задействован первым тестовым модулем 
     "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
-
 from data import app_data
 
 import os
@@ -23,6 +17,7 @@ sample_rate = 48000
 device = torch.device('cpu')
 torch.set_num_threads(4)
 mod_dir = os.path.dirname(os.path.realpath(__file__))
+voice_dir = mod_dir + '/voices/'
 local_file = mod_dir + '/models/v4_ru.pt'
 #if not os.path.isfile(local_file):
 #    torch.hub.download_url_to_file('https://models.silero.ai/models/tts/en/v3_en.pt',
@@ -30,12 +25,17 @@ local_file = mod_dir + '/models/v4_ru.pt'
 model = torch.package.PackageImporter(local_file).load_pickle("tts_models", "model")
 model.to(device)
 class hook:
-    def add_com_last(data):
+    #def add_com_last(data):
+    #    tempGovorilda(data)
+    def govorilka(data):
         tempGovorilda(data)
+    def govorilka_deletevoice(data):
+        deleteVoice(data)
     
     
 def tempGovorilda(data):
-    govorilda(text = data["translate"], voice_path = data["id"]) 
+#    govorilda(text = data["translate"], voice_path = data["id"]) 
+    govorilda(text = data["clear_msg"], voice_path = data["id"]) 
         
 def demonFFplay(music, printed = 1, user = ""):    
     #subprocess.Popen(["ffplay", "-af", "volume=0.3", "-autoexit", music ],
@@ -54,7 +54,17 @@ def demonFFplay(music, printed = 1, user = ""):
         bC = "ffplay -loglevel fatal -nodisp -autoexit '" + music + "'"
         os.system(bC)
 
-
+#удаление ранее сгенеренного голоса
+def deleteVoice(data):
+    try:
+        os.remove(voice_dir + data)
+        print("Файл удалён.")
+    except FileNotFoundError:
+        print("Файл не найден.")
+    except PermissionError:
+        print("Нет прав на удаление.")
+    except Exception as e:
+        print(f"Ошибка:")
 
 def govorilda(text,
               ssml_text=None,
@@ -68,7 +78,7 @@ def govorilda(text,
         audio_path = mod_dir + '/wav/text.wav'
     
     if voice_path != None:        
-        voice_path = mod_dir + "/voices/" + voice_path
+        voice_path = voice_dir + voice_path
         if not os.path.isfile(voice_path):            
             random_emb = torch.randn(2, model.emb_dim, requires_grad=False).to(model.device)
             model.random_emb = random_emb

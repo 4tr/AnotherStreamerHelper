@@ -69,7 +69,7 @@ class AppData:
         ret["file"] = work_dir + "/" + f_cfg_name + ".json"
         return ret["name"],ret["file"]      
     
-    def save_cfg(self, module_name , cfg, cfg_name = "default"): 
+    def save_cfg(self, module_name , cfg, cfg_name = "default",save = 0): 
         name,file= self.cfg_predata(module_name,cfg_name)
         # первым делом залью то что попросили в файл
         with open(file, "w") as fc:
@@ -77,15 +77,17 @@ class AppData:
             fc.close()
         #print("[core]["+name+"] save " + file)
         # теперь для основных потоков обновить данные внутри модулей в переменной __cfg__
-        mod = self.modules[module_name]
-        if (mod["info"]["run_mode"] < 2): # прямое выполение или поток
-            try:
-                mod['module'].__cfg__[cfg_name]=cfg
-                mod['module'].__cfg__[cfg_name]=self.updmarker["__upd__"]
+        if save == 0:
+            mod = self.modules[module_name]
+            if (mod["info"]["run_mode"] < 2): # прямое выполение или поток
                 
-            except Exception as e:  
-                print("[CFG ",module_name,"] Error ",e)      
-        #это очень сырой вариант и тут очень много всего доделывать предстоит
+                try:
+                    mod['module'].__cfg__[cfg_name]=cfg
+                    mod['module'].__cfg__[cfg_name]=self.updmarker["__upd__"]
+                    
+                except Exception as e:  
+                    print("[CFG ",module_name,"] Error ",e)      
+            #это очень сырой вариант и тут очень много всего доделывать предстоит
         
     def get_cfg(self, module_name , cfg_name = "default"):
         ## todo костыль с точками. нужно получать иначе

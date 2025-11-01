@@ -90,7 +90,7 @@ import threading
 import importlib
 import os
 import inspect
-
+import traceback
 
 def list_modules(path=app_data.module_dir):
     modules = {}
@@ -115,8 +115,13 @@ def lmd(module_name, package=app_data.module_dir,last_err = ""):
         install(e.name)
         print(f"пробуем модуль {module_name} снова")
         return lmd(module_name,package,e)
-    except Exception as e:        
+    except Exception as e: 
+        print("\033[0;31m------------------------------------------------------------------------------------")
+        traceback.print_exc()       
+        print("------------------------------------------------------------------------------------\033[0;39m")
+        
         return {"ok":False,"e":f"\033[0;31mОшибка при загрузке {module_name}: {e}\033[0;39m"}
+        
 
 #распознает что на входе и распарсивает соответственно
 def module_select_checker(mod,name):
