@@ -72,6 +72,10 @@ class AppData:
     def save_cfg(self, module_name , cfg, cfg_name = "default",save = 0): 
         name,file= self.cfg_predata(module_name,cfg_name)
         # первым делом залью то что попросили в файл
+        if not os.path.exists(os.path.dirname(file)):
+            # Создаем папку
+            os.makedirs(os.path.dirname(file))
+            
         with open(file, "w") as fc:
             json.dump(cfg, fc, indent=2)
             fc.close()

@@ -4,7 +4,8 @@
 test*
 /modules/silero_tts/voices/
 /modules/silero_tts/wav
-**_default.json
+**default.json
+**_short.json
 **(копия)*
 /modules/YoutubeMdl_userlist.json
 **/modarchive_music/*

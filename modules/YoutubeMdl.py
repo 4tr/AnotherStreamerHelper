@@ -28,7 +28,6 @@ cfg={}
 
 userlist = {}
 ifProxy = True
-
 import httpx
 import socksio
 import pytchat
@@ -205,5 +204,9 @@ def load():
             #print(cid, "->", title)        
     if saved == True:
         save()
+    short = {}    
+    for k in userlist:
+        short[k]=[userlist[k]["dog"],userlist[k]["name"]]
+    app_data.save_cfg(__name__ , short, "short",1)
           
 

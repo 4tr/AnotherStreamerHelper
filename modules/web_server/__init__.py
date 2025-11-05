@@ -16,6 +16,11 @@ PORT = 5000
 import os
 from flask import Flask, render_template, request, jsonify
 
+#урать печать логов доступа с браузера
+import logging
+logging.getLogger('werkzeug').setLevel(logging.WARNING)
+
+
 #template_dir = os.path.abspath('../../frontend/src')
 #template_dir = os.path.abspath('/modules/frontend/src')
 #template_dir = os.path.abspath('')
@@ -59,24 +64,24 @@ def conf_get():
     if request.args.get("save") is not None:
         if mod_name is None:
             return False
-        print("debug4" , mod_name)
+        #print("debug4" , mod_name)
         
         new_data = request.json
-        print(new_data)
+        #print(new_data)
         #return "KEKW"
         # обновляем значения
         #for item in cfg:
         upd = False
         for key, item in cfg.items():   
-            print(item["name"])
+            #print(item["name"])
             if new_data[item["name"]]["name"] is not None:
-                print("22")
+                #print("22")
                 if (item["value"] == new_data[item["name"]]["value"]):
                     print(item["name"] + " : сохранение не требуется")
                 else:
                     upd=True
                     cfg[item["name"]]["value"] = new_data[item["name"]]["value"]
-                    print(item["name"] + " : свежак")
+                    #print(item["name"] + " : свежак")
                         
                 #val = new_data[item["name"]]
                 # привести типы

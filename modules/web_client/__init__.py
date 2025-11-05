@@ -5,7 +5,8 @@ __plugin__ = {
     "type": "web" ,
     "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
     "first_load": False, # переносит модуль в список загружаемых в первую очередь
-    "run_mode": 0 #0 - standart,  1 - thread, 2 - multiprocessing    
+    "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
+    "requirements": ['PyQtWebEngine']
 }
 ifProxy =True
 

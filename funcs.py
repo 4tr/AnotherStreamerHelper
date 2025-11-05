@@ -11,6 +11,16 @@ import sys
 import ast
 from types import ModuleType
 
+import traceback
+import requests
+
+
+import threading
+import importlib
+import os
+import inspect
+
+
 def _get_ast_value(node):
     """Рекурсивно преобразует узел AST в простое значение Python"""
     if isinstance(node, ast.Constant):
@@ -59,19 +69,52 @@ def inspect_module(path):
                         variables[name] = d
     return {"f":functions,"m":variables}
 
+#поиск реального имени пакета
+#def find_pypi_package(module_name):
+#    """Пробует найти подходящий пакет по имени модуля на PyPI."""
+#    # Сначала проверим напрямую
+#    resp = requests.get(f"https://pypi.org/pypi/{module_name}/json")
+#    if resp.status_code == 200:
+#        return module_name  # точное совпадение
+#    else:
+#        print(f"https://pypi.org/pypi/{module_name}/json [CODE]", resp.status_code)
+#    # Если не нашли — попробуем через поиск
+#    search_url = f"https://pypi.org/search/?q={module_name}"
+#    search_url = f"https://pypi.org/pypi?%3Aaction=search&term={module_name}&format=json"
+#    r = requests.get(search_url, timeout=5)
+#    if r.status_code == 200:
+#        # Находим первое совпадение по <a href="/project/.../">
+#        print(r.text)
+#        import re
+#        
+#        match = re.search(r'/project/([^/]+)/', r.text)
+#        if match:
+#            pkg = match.group(1)
+#            print(f"🔍 Найден похожий пакет на PyPI: {pkg}")
+#            return pkg
+#    else:
+#        print(search_url,"[CODE]", resp.status_code)   
+#    return None
+
 
 def install(package):
     #stupid fix я не понимаю какого фига но так у меня работает
     if package == "PyQt5.QtWebEngineWidgets":
         package = "PyQtWebEngine"
+    if package == "obswebsocket":
+        package = 'obs-websocket-py'    
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 def uninstall(package):
     subprocess.check_call([sys.executable, "-m", "pip", "uninstall", package])
+#install('obs-websocket-py')
 
+
+
+#exit()
 
  # uninstall("TensorFlow")
  # exit()
-import importlib
+
 
 def require(package, pip_name=None):
     try:
@@ -85,12 +128,6 @@ def require(package, pip_name=None):
 #flask = require("flask")
 
 
-
-import threading
-import importlib
-import os
-import inspect
-import traceback
 
 def list_modules(path=app_data.module_dir):
     modules = {}
