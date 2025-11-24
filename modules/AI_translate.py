@@ -3,8 +3,8 @@ __plugin__ = {
     "description": "nllb-200 переводчик",
     "type": "text_modificator" ,
     "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
-    "first_load": False,
-    "autorun": False
+    "first_load": True,
+    "autorun": False #игнорируется*** заменен на конфиг настраиваемый с консоли при запуске
 }
 
 from transformers import pipeline

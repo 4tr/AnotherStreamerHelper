@@ -14,12 +14,15 @@ from types import ModuleType
 import traceback
 import requests
 
-
+import inquirer
 import threading
 import importlib
 import os
 import inspect
+import select
+import time
 
+WAIT_TIME = 5  # секунды ожидания ввода для ручной конфигурации
 
 def _get_ast_value(node):
     """Рекурсивно преобразует узел AST в простое значение Python"""
@@ -69,34 +72,6 @@ def inspect_module(path):
                         variables[name] = d
     return {"f":functions,"m":variables}
 
-#поиск реального имени пакета
-#def find_pypi_package(module_name):
-#    """Пробует найти подходящий пакет по имени модуля на PyPI."""
-#    # Сначала проверим напрямую
-#    resp = requests.get(f"https://pypi.org/pypi/{module_name}/json")
-#    if resp.status_code == 200:
-#        return module_name  # точное совпадение
-#    else:
-#        print(f"https://pypi.org/pypi/{module_name}/json [CODE]", resp.status_code)
-#    # Если не нашли — попробуем через поиск
-#    search_url = f"https://pypi.org/search/?q={module_name}"
-#    search_url = f"https://pypi.org/pypi?%3Aaction=search&term={module_name}&format=json"
-#    r = requests.get(search_url, timeout=5)
-#    if r.status_code == 200:
-#        # Находим первое совпадение по <a href="/project/.../">
-#        print(r.text)
-#        import re
-#        
-#        match = re.search(r'/project/([^/]+)/', r.text)
-#        if match:
-#            pkg = match.group(1)
-#            print(f"🔍 Найден похожий пакет на PyPI: {pkg}")
-#            return pkg
-#    else:
-#        print(search_url,"[CODE]", resp.status_code)   
-#    return None
-
-
 def install(package):
     #stupid fix я не понимаю какого фига но так у меня работает
     if package == "PyQt5.QtWebEngineWidgets":
@@ -106,15 +81,6 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 def uninstall(package):
     subprocess.check_call([sys.executable, "-m", "pip", "uninstall", package])
-#install('obs-websocket-py')
-
-
-
-#exit()
-
- # uninstall("TensorFlow")
- # exit()
-
 
 def require(package, pip_name=None):
     try:
@@ -122,12 +88,6 @@ def require(package, pip_name=None):
     except ImportError:
         install(pip_name or package)
         return importlib.import_module(package)
-
-# пример
-#requests = require("requests")
-#flask = require("flask")
-
-
 
 def list_modules(path=app_data.module_dir):
     modules = {}
@@ -161,10 +121,10 @@ def lmd(module_name, package=app_data.module_dir,last_err = ""):
         
 
 #распознает что на входе и распарсивает соответственно
-def module_select_checker(mod,name):
+def module_select_checker(mod,name, permAutorun = False):
     if type(mod) is dict:
         info = mod["m"].get("__plugin__",None)        
-        t = get_plugin_info(info,name)
+        t = get_plugin_info(info,name,permAutorun)
         if t["ok"] != True:
             return t
         info = t["info"]
@@ -172,7 +132,7 @@ def module_select_checker(mod,name):
     elif isinstance( mod , ModuleType):
         info = getattr(mod, "__plugin__", None)
         name = mod.__name__                  
-        t = get_plugin_info(info,name)
+        t = get_plugin_info(info,name,permAutorun)
         if t["ok"] != True:
             return t
         info = t["info"]
@@ -184,18 +144,19 @@ def module_select_checker(mod,name):
     
     return {"ok":True,"e":"","info":info,"name":name,"ls_funcs":ls_funcs}
 
-def get_plugin_info(info, name = "WTF 0_o"):
+def get_plugin_info(info, name = "WTF 0_o", permAutorun = False):
     if info == None:
-            return {"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"}  
+        return {"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"}  
     info['autorun'] = info.get("autorun",False)   
     info['run_mode'] = info.get("run_mode",0)       
     info['first_load'] = info.get("first_load",False)
-    if info['autorun'] == False:            
-        return {"ok":False,"e":f"\033[43m \033[49m \033[33mМодуль {name} помечен как не запускаемый автоматически \033[0;39m"}
+    if permAutorun == False:
+        if info['autorun'] == False:            
+            return {"ok":False,"e":f"\033[43m \033[49m \033[33mМодуль {name} помечен как не запускаемый автоматически \033[0;39m"}
     return {"ok":True,"e":False,"info":info}
     
-def validate_module(mod, name = "WTF 0_o"):
-    tmp = module_select_checker(mod,name)
+def validate_module(mod, name = "WTF 0_o",permAutorun = False):
+    tmp = module_select_checker(mod,name,permAutorun)
     if tmp["ok"] == False:
         return tmp
     else:
@@ -252,8 +213,8 @@ def runner(name):
     
 
 
-def loader(mod,name,first_load = True): 
-    vm = validate_module(mod)
+def loader(mod,name,first_load = True,permAutorun = False): 
+    vm = validate_module(mod,"WTF 0_0",permAutorun)
     if mod and vm["ok"]:    
         info = vm["info"]
         if info["first_load"] != first_load:
@@ -264,41 +225,121 @@ def loader(mod,name,first_load = True):
     else:
         print(vm["e"])  
 # попытка проанализоровать модуль до того как он загрузится
-def pre_validate_module(name):
+# permAutorun true дает команду не учитывать надстройку Autorun внутри модуля.
+def pre_validate_module(name,permAutorun = False):
     r = inspect_module(name)
-    return validate_module(r,name)
+    return validate_module(r,name,permAutorun)
+def sort_modules_autorun(ans,valid_first = [],valid_other = []):
+    valid_first_filtered= []
+    valid_other_filtered= []
+    for n in valid_first:
+        for s in ans:
+            if n == s:
+                valid_first_filtered.append(s)
+    for n in valid_other:
+        for s in ans:
+            if n == s:
+                valid_other_filtered.append(s)
+    return valid_first_filtered, valid_other_filtered
+    
+def consoleGraphMenu(valid_all = [] ,valid_first = [],valid_other = [],savedata_autorun = []):
+    if len(valid_all) == 0:
+        print(" \033[91m Что ты хотел тут настраивать? у тебя нет модулей вообще! \033[39m")
+        exit()
+    items_default = []
+    
+    for n in valid_all:
+        found = False        
+        for m in savedata_autorun:
+            if found == False:            
+                if n == m:
+                    items_default.append(n)
+                    found = True
+    
+        
+    questions = [
+        inquirer.Checkbox(
+            'features',
+            message="\033[0;97m Выберите модули из списка \033[0;39m",
+            choices=valid_all,
+            default=items_default
+        )
+    ]
+
+    answers = inquirer.prompt(questions)
+    #print("Вы выбрали:", answers['features'])
+    choice = input("Сохранить ? y/n: ")
+    if (choice == 'Y') or(choice == 'y') or(choice == 'д') or(choice == 'Д') or(choice == 'Н') or(choice == 'н'):
+        print('сохраняю ...')
+        app_data.save_cfg("CORE" , answers['features'], "autorun_modules")
+        
+    return sort_modules_autorun(answers['features'],valid_first,valid_other)
         
 def load_all_modules(path=app_data.module_dir):
     available = list_modules(path)    
     #сформировать ОДИН Б**ь раз список валидных модулей для работы
     valid_first = []
     valid_other = []
+    valid_all = []
+    #шмат кода для ручной инициализации модулей 
+    permAutorun = False
+    openGraphMenu = False
+    #пока вот так
+    permAutorun = True
+    savedata_autorun = app_data.get_cfg("CORE",'autorun_modules')             
+    if savedata_autorun == None:
+        savedata_autorun = []
+    #print(savedata_autorun)
+    
+    if savedata_autorun == []:
+        print(f"[CORE] \033[91m нет конфигураций модулей. принудительный ввод в настройку запуска модулей.\033[39m")    
+        openGraphMenu = True
+    else:        
+        print(f"[CORE] \033[91m Для входа в режим конфигурации нажми enter. Таймер {WAIT_TIME} сек.\033[39m")
+
+        start = time.time()
+        while time.time() - start < WAIT_TIME:
+            # select проверяет, есть ли данные в stdin
+            rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+            if rlist:  # что-то ввели
+                sys.stdin.readline()  # очистить ввод
+                print("[CORE] Запущен ручной режим конфигурации модулей")
+                permAutorun = True            
+                openGraphMenu = True
+                break
+        if permAutorun == False:
+            print("[CORE] Продолжается обычный запуск приложения")
+            
     for name in available:
-        t = pre_validate_module(available[name])
-        if t["ok"]:
+        t = pre_validate_module(available[name],permAutorun)
+        if t["ok"]:   
+            valid_all.append(name)         
             if t["info"]["first_load"]:
                 valid_first.append(name)            
             else:
                 valid_other.append(name)    
-        else:
+        else:            
             print(t["e"])        
-   
-    #старый код требуется нормальная очередь !!!!!!!!!!!
-    #сначала пройдемся по модулям с пометкой first_load 
+          
+    if openGraphMenu:
+        valid_first , valid_other = consoleGraphMenu(valid_all,valid_first,valid_other,savedata_autorun)
+    else:
+        valid_first , valid_other = sort_modules_autorun(savedata_autorun,valid_first,valid_other)    
     for name in valid_first:
-        r = lmd(name, package=path) 
+        r = lmd(name, package=path)         
         if r["ok"] == True:
-            loader(r["mod"],name,True)              
+            loader(r["mod"],name,True,permAutorun)              
+            print('[debug] loader')
         else:
             valid_first.remove(name)
             print(r["e"]) #"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"
-             
             
     #теперь пройдемся по модулям без пометки first_load или с false
     for name in valid_other:
-        r = lmd(name, package=path)        
+        r = lmd(name, package=path)              
         if r["ok"] == True:
-            loader(r["mod"],name,False)        
+            loader(r["mod"],name,False,permAutorun) 
+            print('[debug] loader')       
         else:
             valid_other.remove(name)
             print(r["e"])    
@@ -320,22 +361,7 @@ def load_all_modules(path=app_data.module_dir):
     #print(app_data.get_process_module("YtNoKey"))
     
     #exit()
-    
-    
-    #костыль!!!
+
     if runWebWindow :
         runner("web_client")
     
-    
-
-
-
-
-    
-
-
-
-
-
-
-

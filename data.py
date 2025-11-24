@@ -82,16 +82,19 @@ class AppData:
         #print("[core]["+name+"] save " + file)
         # теперь для основных потоков обновить данные внутри модулей в переменной __cfg__
         if save == 0:
-            mod = self.modules[module_name]
-            if (mod["info"]["run_mode"] < 2): # прямое выполение или поток
-                
-                try:
-                    mod['module'].__cfg__[cfg_name]=cfg
-                    mod['module'].__cfg__[cfg_name]=self.updmarker["__upd__"]
+            if module_name != "CORE":
+                mod = self.modules[module_name]
+                if (mod["info"]["run_mode"] < 2): # прямое выполение или поток
                     
-                except Exception as e:  
-                    print("[CFG ",module_name,"] Error ",e)      
-            #это очень сырой вариант и тут очень много всего доделывать предстоит
+                    try:
+                        mod['module'].__cfg__[cfg_name]=cfg
+                        mod['module'].__cfg__[cfg_name]=self.updmarker["__upd__"]
+                        
+                    except Exception as e:  
+                        print("[CFG ",module_name,"] Error ",e)      
+                #это очень сырой вариант и тут очень много всего доделывать предстоит
+            
+                    
         
     def get_cfg(self, module_name , cfg_name = "default"):
         ## todo костыль с точками. нужно получать иначе
@@ -104,16 +107,17 @@ class AppData:
                 f.close()
             return cfg  
         else:
-            mod = self.modules[name]["module"]
-            ret = getattr(mod, "__cfg__", None)
-            if ret == None: 
-                print("[",name,"] not cfg file and class 0_o return None")
-            else:
-                ret = ret.get(cfg_name, None)
-                if  ret == None: 
-                    print("[",name,"] not find [",cfg_name,"] in cfg class 0_о")
+            if module_name != "CORE":
+                mod = self.modules[name]["module"]
+                ret = getattr(mod, "__cfg__", None)
+                if ret == None: 
+                    print("[",name,"] not cfg file and class 0_o return None")
                 else:
-                    return ret
+                    ret = ret.get(cfg_name, None)
+                    if  ret == None: 
+                        print("[",name,"] not find [",cfg_name,"] in cfg class 0_о")
+                    else:
+                        return ret
                                        
         return None
     def queue_process_messages(self):

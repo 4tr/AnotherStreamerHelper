@@ -3,7 +3,7 @@ __plugin__ = {
     "name": "web client ",
     "description": "веб сервер flask",
     "type": "web" ,
-    "autorun":True, # на данный момент используется как команда к загрузке модуля (пока нет других настроек заменяющее это)
+    "autorun":False, #игнорируется*** заменен на конфиг настраиваемый с консоли при запуске
     "first_load": False, # переносит модуль в список загружаемых в первую очередь
     "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
     "requirements": ['PyQtWebEngine']

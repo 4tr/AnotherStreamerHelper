@@ -2,7 +2,7 @@ __plugin__ = {
     "name": "Youtube chat parser",
     "description": "Парсер чата без токенов. токен нужен для запроса имен каналов",
     "type": "chat" ,
-    "autorun" : True,
+    "autorun" : False, #игнорируется*** заменен на конфиг настраиваемый с консоли при запуске
     "first_load": True,
     "run_mode": 2 #0 - standart,  1 - thread, 2 - multiprocessing    
 }
@@ -129,7 +129,6 @@ def run(com_queue):
             #for i in tmp:
             #    print(i)
             parts = {}  
-            print("TRIGGER!!!!!!!!!!!!!!!")
             tmpname = c.author.name
             tmpname =tmpname[1:]
             parts["name"]=get_channel_name(c.author.channelId , c.author.name)
@@ -158,7 +157,7 @@ def run(com_queue):
             parts['msg'] = msg                    
             parts['clear_msg'] = msg_con                    
                       
-            print(f"["+__name__+"]",parts["name"],":",msg_con)            
+            print(f"[Toutube]\033[0;31m",parts["name"],"\033[0;39m:",msg_con)            
             com_queue.put(parts)    # такой код для модуля работающего в режиме multiprocessing
             # app_data.add_com(parts)  а такой в режиме thread
             #print(parts)            
