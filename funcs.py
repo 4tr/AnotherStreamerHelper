@@ -15,13 +15,16 @@ import traceback
 import requests
 
 import inquirer
+from inquirer.themes import GreenPassion
 import threading
 import importlib
 import os
 import inspect
 import select
 import time
+import numpy
 
+import re
 WAIT_TIME = 5  # секунды ожидания ввода для ручной конфигурации
 
 def _get_ast_value(node):
@@ -241,39 +244,135 @@ def sort_modules_autorun(ans,valid_first = [],valid_other = []):
             if n == s:
                 valid_other_filtered.append(s)
     return valid_first_filtered, valid_other_filtered
-    
-def consoleGraphMenu(valid_all = [] ,valid_first = [],valid_other = [],savedata_autorun = []):
-    if len(valid_all) == 0:
-        print(" \033[91m Что ты хотел тут настраивать? у тебя нет модулей вообще! \033[39m")
-        exit()
-    items_default = []
-    
-    for n in valid_all:
-        found = False        
-        for m in savedata_autorun:
-            if found == False:            
-                if n == m:
-                    items_default.append(n)
-                    found = True
+def vopros(method = "q", msg = "",list = ["error"],default = None,name = ""):
+    if (name == ""):
+        name = method
+    if (method == "features"):        
+        q = [inquirer.Checkbox(name,message=msg,choices=list,default=default)]        
+        return inquirer.prompt(q, theme=GreenPassion())[name]
+    if (method == "list"):        
+        q = [inquirer.List(name,message=msg,choices=list,default=default),]
+        return inquirer.prompt(q, theme=GreenPassion())[name]
+    if (method == 'text'):
+        if name == 'number':
+            q = [inquirer.Text(name,message=msg,default=default,validate=lambda _, x: re.fullmatch('\d+', x),),]
+        else:    
+            q = [inquirer.Text(name,message=msg,default=default,),]
+        return inquirer.prompt(q, theme=GreenPassion())[name]    
+        inquirer.Text('name', message="What's your name",default="123"),
     
         
-    questions = [
-        inquirer.Checkbox(
-            'features',
-            message="\033[0;97m Выберите модули из списка \033[0;39m",
-            choices=valid_all,
-            default=items_default
-        )
-    ]
+def console_module_config(module_name = ""):
+    c = app_data.get_config_v2(module_name=module_name,full_data=True)
+    #print(c)
+    l = []
+    text = "список настроек модуля "+module_name
+    if c != None:
+        for i in c:
+            #ret[i]=cfg[i]['value']
+            l.append(i)
+    else:
+        text = "у модуля " + module_name + " нет настроек"
+    l.append('>назад<')    
+    #print(i)   
+    a = vopros("list",text,l)
+    if a == '>назад<':            
+        return  
+    default = ""
+    if c[a]['type'] == "text": default = c[a]['value']
+    if c[a]['type'] == "checkbox": 
+        default = "Отключено"
+        if c[a]['value']: 
+            default = "Активно"
+    if c[a]['type'] == "password": default = "***"
+    if c[a]['type'] == "number": default = str(c[a]['value'])
+    
+    
+    ##fixme добавить редактирование других полей
+    txtt ="-"+c[a]['type']+"- редактируем поле '"+a+"'-'"+c[a]['label']+"' модуля '"+module_name+"'"
+    if c[a]['type'] == "checkbox":
+        e = vopros("list",txtt,list=['Активно','Отключено'], default=default)
+        if e == "Активно":
+            e = True
+        else:
+            e = False     
+    else:
+        if c[a]['type'] == "number":    
+            e = vopros("text",txtt,default=default,name=c[a]['type'])
+        else:
+            e = vopros("text",txtt,default=default)
+        
+    if c[a]['type'] == "number": e = int(e)
+        
+    if e != c[a]['value']:
+        s = vopros("list","Сохранить?",list=["Да","Нет"],default="Да")
+        if s == "Да":
+            if c[a]['type'] == "text": c[a]['value']=e
+            if c[a]['type'] == "password": c[a]['value']=e                        
+            if c[a]['type'] == "checkbox": c[a]['value']=e                        
+            if c[a]['type'] == "number": c[a]['value']=e                        
+            app_data.save_cfg(module_name,c,save = 1)
+            print("Сохранено!")
+            #exit()
+    console_module_config(module_name)       
+    
+    
+def  console_listmodules_configs(savedata_autorun=[]):
+    ans_modulelist_q = savedata_autorun.copy()        
+    ans_modulelist_q.append('>назад<')
+    a = vopros("list","список активных модулей",ans_modulelist_q)
+    if a == '>назад<':            
+        return 
+    console_module_config(a)
+    return console_listmodules_configs(savedata_autorun)        
+         
+    #app_data.save_cfg("CORE" , answers['features'], "autorun_modules")
 
-    answers = inquirer.prompt(questions)
-    #print("Вы выбрали:", answers['features'])
-    choice = input("Сохранить ? y/n: ")
-    if (choice == 'Y') or(choice == 'y') or(choice == 'д') or(choice == 'Д') or(choice == 'Н') or(choice == 'н'):
-        print('сохраняю ...')
-        app_data.save_cfg("CORE" , answers['features'], "autorun_modules")
+def consoleGraphMenu(valid_all = [] ,valid_first = [],valid_other = [],savedata_autorun = []):
+    
+    
+    ans = vopros("list","Меню настроек",['включить/отключить модули','редактировать настройки активных  модулей','СТАРТ'])
+    print("Вы выбрали:", ans)  
+    if ans == 'СТАРТ':
+        return sort_modules_autorun(savedata_autorun,valid_first,valid_other)
+    if ans == 'редактировать настройки активных  модулей':
+        console_listmodules_configs(savedata_autorun)
+        return consoleGraphMenu(valid_all,valid_first,valid_other,savedata_autorun)
+    if ans == 'включить/отключить модули':        
+        if len(valid_all) == 0:
+            print(" \033[91m Что ты хотел тут настраивать? у тебя нет модулей вообще! \033[39m")
+            exit()
+        items_default = []
         
-    return sort_modules_autorun(answers['features'],valid_first,valid_other)
+        for n in valid_all:
+            found = False        
+            for m in savedata_autorun:
+                if found == False:            
+                    if n == m:
+                        items_default.append(n)
+                        found = True
+        
+            
+        questions = [
+            inquirer.Checkbox(
+                'features',
+                message="\033[0;97m Выберите модули из списка чтобы включить/отключить\033[0;39m",
+                choices=valid_all,
+                default=items_default
+            )
+        ]
+
+        answers = inquirer.prompt(questions)
+        #ЕСЛИ НИЧЕГО НЕ ПОМЕНЯЛОСЬ ТО И СОХРАНЯТЬ НЕ НАДО
+        if numpy.array_equal(answers['features'], savedata_autorun) == False:
+            q = [inquirer.List("Save", message="Сохранить?", choices=["Да", "Нет"], default="Да"),]
+            an = inquirer.prompt(q, theme=GreenPassion())
+            if ( an['Save'] == 'Да'):
+                print('сохраняю ...')
+                savedata_autorun = answers['features'].copy()
+                app_data.save_cfg("CORE" , savedata_autorun, "autorun_modules")
+        return consoleGraphMenu(valid_all,valid_first,valid_other,savedata_autorun)    
+        #return sort_modules_autorun(savedata_autorun,valid_first,valid_other)
         
 def load_all_modules(path=app_data.module_dir):
     available = list_modules(path)    

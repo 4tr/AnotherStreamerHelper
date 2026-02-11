@@ -8,7 +8,7 @@ __plugin__ = {
     "run_mode": 0, #0 - standart,  1 - thread, 2 - multiprocessing    
     "requirements": ['PyQtWebEngine']
 }
-ifProxy =True
+ifProxy =False
 
 
 from data import app_data
@@ -53,7 +53,7 @@ def web_wind(url="", win_name=""):
     icon_path = os.path.dirname(__file__) + "/img/icon.png"
     
     
-    print("------------------------",icon_path)
+    #print("------------------------",icon_path)
     if os.path.exists(icon_path):
         window.setWindowIcon(QIcon(icon_path))    
 

@@ -27,7 +27,7 @@ __cfg__={
 cfg={}
 
 userlist = {}
-ifProxy = True
+ifProxy = False
 import httpx
 import socksio
 import pytchat

@@ -40,11 +40,13 @@ class AppData:
         }
         # список элементов в сообщении чата
         self.com_keys = ["name", "id", "pl", "t", "a","msg"]
-    def get_config_v2(self, module_name , cfg_name = "default"):
+    def get_config_v2(self, module_name , cfg_name = "default", full_data = False):
         cfg = self.get_cfg(module_name,cfg_name)    
         if cfg == None:
             return cfg
         ret = {}
+        if full_data:
+            return cfg
         for i in cfg:
             ret[i]=cfg[i]['value']
         return ret    
@@ -108,8 +110,12 @@ class AppData:
             return cfg  
         else:
             if module_name != "CORE":
-                mod = self.modules[name]["module"]
-                ret = getattr(mod, "__cfg__", None)
+                mo = self.modules.get(name,None)
+                if mo != None:
+                    mod = self.modules[name]["module"]                    
+                    ret = getattr(mod, "__cfg__", None)
+                else:
+                    ret = None    
                 if ret == None: 
                     print("[",name,"] not cfg file and class 0_o return None")
                 else:
@@ -142,8 +148,10 @@ class AppData:
         else:
             if (uid != "AI") and (uid != "Bot") and (uid != "Console"):
                 return
-            params = self.comPrep[uid].copy()
-            params['msg']=str(msg[msg])
+            params = self.com_Prep[uid].copy()
+            params['msg']=str(msg['msg'])
+            params["clear_msg"]=str(msg["msg"])
+            print("[CORE] ", uid ,": " ,params['clear_msg'])
         
         params["nn"]=len(self.com)           
         

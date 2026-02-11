@@ -12,19 +12,19 @@
     "value": true
   },
   "username": {
-    "label": "1",
+    "label": "username",
     "name": "username",
     "type": "text",
     "value": "admin"
   },
   "timeout": {
-    "label": "2",
+    "label": "timeout",
     "name": "timeout",
     "type": "number",
     "value": 666
   },
   "debug": {
-    "label": "3",
+    "label": "debug",
     "name": "debug",
     "type": "checkbox",
     "value": true
