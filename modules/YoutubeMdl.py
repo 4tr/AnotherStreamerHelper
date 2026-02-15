@@ -50,8 +50,8 @@ def get_channel_titles_by_ids(channel_ids: List[str]) -> Dict[str, str]:
     Возвращает словарь channel_id -> channel_title (snippet.title).
     Делает batch-запросы по 50 id за раз.
     """
-    print("----------------------запрос ников----------------------------")
-    print(channel_ids)
+    #print("----------------------запрос ников----------------------------")
+    #print(channel_ids)
     result = {}
         
     for chunk in chunked(channel_ids, 50):
@@ -157,7 +157,7 @@ def run(com_queue):
             parts['msg'] = msg                    
             parts['clear_msg'] = msg_con                    
                       
-            print(f"[Toutube]\033[0;31m",parts["name"],"\033[0;39m:",msg_con)            
+            ######################################print(f"[Toutube]\033[0;31m",parts["name"],"\033[0;39m:",msg_con)            
             com_queue.put(parts)    # такой код для модуля работающего в режиме multiprocessing
             # app_data.add_com(parts)  а такой в режиме thread
             #print(parts)            

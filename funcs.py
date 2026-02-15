@@ -226,7 +226,7 @@ def loader(mod,name,first_load = True,permAutorun = False):
         get_hooks_module(name,mod)
         print("\033[42m \033[0;39m успешно загружен:<", name , "> \033[1;97m", info["name"], "\033[0;39m ")        
     else:
-        print(vm["e"])  
+        print('err f 229',vm["e"])  
 # попытка проанализоровать модуль до того как он загрузится
 # permAutorun true дает команду не учитывать надстройку Autorun внутри модуля.
 def pre_validate_module(name,permAutorun = False):
@@ -331,7 +331,7 @@ def  console_listmodules_configs(savedata_autorun=[]):
 def consoleGraphMenu(valid_all = [] ,valid_first = [],valid_other = [],savedata_autorun = []):
     
     
-    ans = vopros("list","Меню настроек",['включить/отключить модули','редактировать настройки активных  модулей','СТАРТ'])
+    ans = vopros("list","Меню настроек",['включить/отключить модули','редактировать настройки активных  модулей','СТАРТ'],default='СТАРТ')
     print("Вы выбрали:", ans)  
     if ans == 'СТАРТ':
         return sort_modules_autorun(savedata_autorun,valid_first,valid_other)
@@ -418,7 +418,7 @@ def load_all_modules(path=app_data.module_dir):
             else:
                 valid_other.append(name)    
         else:            
-            print(t["e"])        
+            print('err f 421',t["e"])        
           
     if openGraphMenu:
         valid_first , valid_other = consoleGraphMenu(valid_all,valid_first,valid_other,savedata_autorun)
@@ -431,7 +431,7 @@ def load_all_modules(path=app_data.module_dir):
             print('[debug] loader')
         else:
             valid_first.remove(name)
-            print(r["e"]) #"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"
+            print('err f 434',r["e"]) #"ok":False,"e":f"\033[101m \033[0;31m В модуле {name} нет описания __plugin__ \033[0;39m"
             
     #теперь пройдемся по модулям без пометки first_load или с false
     for name in valid_other:
@@ -441,7 +441,7 @@ def load_all_modules(path=app_data.module_dir):
             print('[debug] loader')       
         else:
             valid_other.remove(name)
-            print(r["e"])    
+            print('err f 444'.r["e"])    
 
     runWebWindow = False
     #запуск функций модулей

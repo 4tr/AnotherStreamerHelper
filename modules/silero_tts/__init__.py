@@ -94,7 +94,8 @@ def govorilda(text,
     model.write_wave(path=audio_path,
         audio=(audio * 32767).numpy().astype('int16'),
         sample_rate=sample_rate)
-    demonFFplay(audio_path,0,voice_path)
+    #demonFFplay(audio_path,0,voice_path)
+    demonFFplay(audio_path,2,voice_path)
     #audio_paths = model.save_wav(text=example_text,
     #                         speaker=speaker,
     #                         sample_rate=sample_rate,

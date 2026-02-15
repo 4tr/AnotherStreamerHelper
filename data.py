@@ -34,12 +34,64 @@ class AppData:
                           }
         # шаблоны для чата для консоли и нейронки
         self.com_Prep = {
-            "Console" :{"name": "Console", "id": "Console", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/console.png", "msg" : ""},
-            "AI" : {"name": "AI", "id": "AI", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/AI.png", "msg" : ""},
-            "Bot" : {"name": "Bot", "id": "Bot", "pl" : "l", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/Bot.png", "msg" : ""}
+            "Console" :{"name": "Console", "id": "Console", "pl" : "lo", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/console.png", "msg" : ""},
+            "AI" : {"name": "AI", "id": "AI", "pl" : "lo", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/AI.png", "msg" : ""},
+            "Bot" : {"name": "Bot", "id": "Bot", "pl" : "lo", "t" : "2025-09-07T23:53:27.303543+00:00", "a" : "static/img/Bot.png", "msg" : ""}
+        }
+        #fixme
+        self.com_Platforms ={
+            "lo":{"label":"Local"    ,"color":9},
+            "yt":{"label":"Youtube"  ,"color":10},
+            "tw":{"label":"Twitch"   ,"color":6},
+            "ERR":{"label":"???"   ,"color":2}
         }
         # список элементов в сообщении чата
         self.com_keys = ["name", "id", "pl", "t", "a","msg"]
+        
+    def col(self,txt = "" ,color = 0, worker = 0,color2 =0):
+        #fixme syst = 0 - linux
+        #worker 0 - begin+txt+end code ( end standart)
+        #worker 1 - only begin code + txt 
+        #worker 2 - txt+end code (end code = color )
+         
+        syst = 0
+        color = str(color)
+        color2 = str(color2)
+        linux_colors = {
+            "0" :{"label":"Стандартный",                  "text_code":"\033[0;39m","bg_code":"\033[49m"},
+            "1" :{"label":"Чёрный",                       "text_code":"\033[0;30m","bg_code":"\033[40m"},
+            "2" :{"label":"Тёмно-красный",                "text_code":"\033[0;31m","bg_code":"\033[41m"},
+            "3" :{"label":"Тёмно-зелёный",                "text_code":"\033[0;32m","bg_code":"\033[42m"},
+            "4" :{"label":"Тёмно-жёлтый «Оранжевый»",     "text_code":"\033[0;33m","bg_code":"\033[43m"},
+            "5" :{"label":"Тёмно-синий",                  "text_code":"\033[0;34m","bg_code":"\033[44m"},
+            "6" :{"label":"Темно-пурпурный",              "text_code":"\033[0;35m","bg_code":"\033[45m"},
+            "7" :{"label":"Тёмно-голубой",                "text_code":"\033[0;36m","bg_code":"\033[46m"},
+            "8" :{"label":"Светло-серый",                 "text_code":"\033[0;37m","bg_code":"\033[47m"},
+            "9" :{"label":"Тёмно-серый",                  "text_code":"\033[1;90m","bg_code":"\033[100m"},
+            "10":{"label":"Красный",                      "text_code":"\033[1;91m","bg_code":"\033[101m"},
+            "11":{"label":"Зелёный",                      "text_code":"\033[1;92m","bg_code":"\033[101m"},
+            "12":{"label":"Оранжевый",                    "text_code":"\033[1;93m","bg_code":"\033[103m"},
+            "13":{"label":"Синий",                        "text_code":"\033[1;94m","bg_code":"\033[104m"},
+            "14":{"label":"Пурпурный",                    "text_code":"\033[1;95m","bg_code":"\033[105m"},
+            "15":{"label":"Голубой",                      "text_code":"\033[1;96m","bg_code":"\033[106m"},
+            "16":{"label":"Белый",                        "text_code":"\033[1;97m","bg_code":"\033[107m"},
+        }
+        arr = linux_colors.copy()      
+        
+        #fixme shindows
+        if worker == 0:
+            return arr[color]['text_code'] + arr[color2]['bg_code'] + txt +  arr["0"]['text_code'] + arr["0"]['bg_code']
+            #return arr[color]['text_code'] + txt + arr["0"]['text_code']
+            
+        if worker == 1:
+            return arr[color]['text_code'] + txt
+        if worker == 0:
+            return txt + arr[color]['text_code']
+    #fixme шинда*  
+    def plat_decorator(self,pl = "ERR"):        
+        plat = self.com_Platforms.get(pl,self.com_Platforms["ERR"])
+        return self.col(str("["+plat['label']+"]"),plat["color"])    
+        
     def get_config_v2(self, module_name , cfg_name = "default", full_data = False):
         cfg = self.get_cfg(module_name,cfg_name)    
         if cfg == None:
@@ -136,24 +188,33 @@ class AppData:
             self.add_com(msg)
     
     def add_com(self,msg, uid = None):
+        if msg["msg"] == "":
+            return
         #print("[pre HOOK]",msg['msg'])    
         if msg.get("clear_msg",None) == None:
             msg["clear_msg"]=msg["msg"]    
-        self.hook("add_com",msg)
-        self.hook("add_com_last",msg)
-        #print("[post HOOK]",msg['msg'])
-        
+        #add system messages    
         if uid == None:        
             params = msg.copy()
         else:
             if (uid != "AI") and (uid != "Bot") and (uid != "Console"):
                 return
+            
             params = self.com_Prep[uid].copy()
             params['msg']=str(msg['msg'])
             params["clear_msg"]=str(msg["msg"])
-            print("[CORE] ", uid ,": " ,params['clear_msg'])
         
-        params["nn"]=len(self.com)           
+        
+        
+        self.hook("add_com",params)
+        #print('---')
+        #print(params)
+        self.hook("add_com_last",params)
+        params["nn"]=len(self.com) 
+        #print("[post HOOK]",msg['msg'])        
+        print(self.plat_decorator(params['pl'])," ", params['name'] ,": " ,params['clear_msg'])    
+        
+                  
         
         # чекнуть пользователя *** 
                 
@@ -173,8 +234,8 @@ class AppData:
             for v in a:
                 a[v](*args, **kwargs)
         except Exception as e:  
-            print()
-            print("[HOOK ",hook_name,"] Error ",e)        
+            print("[HOOK ",hook_name,"] Error ",e) 
+            #print(self)       
             
     def add_threads(self, func, name):
         t = threading.Thread(target=func, daemon=True)
@@ -212,7 +273,7 @@ class AppData:
             
     def add_message(self, msg: str):
         with self._lock:  
-            print(msg)
+            #print(msg)
             self.messages.append(msg)
 
     def get_messages(self):

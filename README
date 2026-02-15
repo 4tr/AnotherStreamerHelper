@@ -5,4 +5,23 @@ The startup script creates a venv and loads it.
 At this stage, there are a lot of bugs, but dependencies should load automatically at startup.
 To check the chat, you need to specify the channel in the file /models/twitchChatreader.py.
 
+pyenv prepare (ubuntu)
+sudo apt update
+sudo apt install -y \
+  build-essential \
+  libssl-dev \
+  zlib1g-dev \
+  libbz2-dev \
+  libreadline-dev \
+  libsqlite3-dev \
+  curl \
+  libncursesw5-dev \
+  xz-utils \
+  tk-dev \
+  libxml2-dev \
+  libxmlsec1-dev \
+  libffi-dev \
+  liblzma-dev \
+  git
+curl https://pyenv.run | bash
 

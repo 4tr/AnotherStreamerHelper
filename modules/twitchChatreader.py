@@ -179,11 +179,11 @@ def run():
                         if len(test) > 1 :
                             text[1]=test[0]
                             #ho("translate",text) 
-                            print("\033[0;31m[Twitch]\033[0;39m \033[0;35m",parts["name"],"\033[0;39m:", text[1])
+                            ######################################print("\033[0;31m[Twitch]\033[0;39m \033[0;35m",parts["name"],"\033[0;39m:", text[1])
                             
-                        else:
+                        ######################################else:
                             #ho("translate",text)                             
-                            print("[Twitch] \033[0;35m",parts["name"],"\033[0;39m:", text[1])
+                            ######################################print("[Twitch] \033[0;35m",parts["name"],"\033[0;39m:", text[1])
                         parts["msg"] = text[1] 
                         parts["emotes"] = parse_emotes_tag(parts["emotes"],parts["msg"])
                         #print(parts["emotes"])    
